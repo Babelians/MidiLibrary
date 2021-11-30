@@ -265,12 +265,12 @@ def score_detail(request, pk):
     recommend_scores = Score.objects.all().order_by('-play_count')
     recommend_byAlbam = Score.objects.filter(albam=score.albam, albam_num=score.albam_num+1)
     recommend_byTag = score_to_score_byTags(score)
-    r = request
-    ru = request.user
-    ruid = request.user.id
-    if request.user.id:
-        purchased = Score_buying_history.objects.filter(score_id=score.id, user_id=request.user)
-    else:
+    try:
+        if request.user.id:
+            purchased = Score_buying_history.objects.filter(score_id=score.id, user_id=request.user.id)
+        else:
+            purchased = False
+    except:
         purchased = False
     account = stripe.Account.retrieve(score.artist.stripe_id)
 

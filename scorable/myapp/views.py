@@ -141,7 +141,7 @@ def user_edit(request, pk):
             form.save()
             my2 = CustomUser.objects.get(pk=pk)
             path2 = os.path.join(MEDIA_ROOT, str(my2.face))
-            if (path != path2) and (path != os.path.join(MEDIA_ROOT, 'face/defo.jpg')): #pathに変更があり、前の画像がデフォルトでないとき
+            if (path != path2) and (path != os.path.join(MEDIA_ROOT, 'face/defo.png')): #pathに変更があり、前の画像がデフォルトでないとき
                 os.remove(path)
             return redirect('user_detail', pk=pk)
     else:
@@ -265,6 +265,8 @@ def score_detail(request, pk):
     recommend_scores = Score.objects.all().order_by('-play_count')
     recommend_byAlbam = Score.objects.filter(albam=score.albam, albam_num=score.albam_num+1)
     recommend_byTag = score_to_score_byTags(score)
+    ru = request.user
+    ruid = request.user.id
     if request.user.id:
         purchased = Score_buying_history.objects.filter(score_id=score.id, user_id=request.user)
     else:

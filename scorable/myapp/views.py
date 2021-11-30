@@ -280,7 +280,7 @@ def score_detail(request, pk):
         currency = 'usd'
 
     posts = Comment.objects.filter(song_id=pk).order_by('-heart_count')
-    if request.user.id: #ログインしてるか
+    if False:#request.user.id: #ログインしてるか
         song_heart = Song_heart.objects.filter(song_id=pk, user_id=request.user)
         song_heart_mycount = song_heart.count()
         follow_mycount = Follow.objects.filter(follow_id=score.artist.id, user_id=request.user).count()

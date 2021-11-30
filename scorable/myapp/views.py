@@ -265,13 +265,13 @@ def score_detail(request, pk):
     recommend_scores = Score.objects.all().order_by('-play_count')
     recommend_byAlbam = Score.objects.filter(albam=score.albam, albam_num=score.albam_num+1)
     recommend_byTag = score_to_score_byTags(score)
-    try:
-        if request.user.id:
-            purchased = Score_buying_history.objects.filter(score_id=score.id, user_id=request.user.id)
-        else:
-            purchased = False
-    except:
-        purchased = False
+    
+    """if request.user.id:
+        purchased = Score_buying_history.objects.filter(score_id=score.id, user_id=request.user.id)
+    else:"""
+        
+    purchased = False
+
     account = stripe.Account.retrieve(score.artist.stripe_id)
 
     if score.artist.country == "JP":

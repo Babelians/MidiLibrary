@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="content">
+    <div class="inner-content" style="margin: 0 auto; width: 1150px;">
+        
+        
+        {% if my == user %}
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="align-items: center; display: flex;">
+                    <div id="face_parent" style="width: 100px; height: 100px; border-radius: 50%;">
+                        <img src="{{ my.face.url }}" id="myface" style="width: 100px; height: 100px; border-radius: 50%;"/>
+                    </div>
+                    <input type="file" name="face" accept="image/*" id="id_face" style="margin: 0 0 0 20px;">
+                </div>
+                <div>
+                    <input type="text" name="username" value="{{ my.username }}" maxlength="150" required="" id="id_username" style="margin: 20px 0 0 0; display: block; width: 500px; height:40px;">
+                    <textarea name="explanation" maxlength="2000" id="id_username" placeholder="プロフィール" style="width: 500px; height: 150px; display: block;">{{ my.explanation }}</textarea>
+                    <button type="submit" style="display: block;">submit</button>
+                </div>
+            </form>
+        {% endif %}
+        
+    </div>
+</div>
+
+    <script>
+        document.getElementById("id_face").addEventListener('change', function(e){
+    
+            if(document.getElementById("myface")){
+                document.getElementById("myface").remove();
+            }
+    
+            var file_reader = new FileReader();
+    
+            file_reader.addEventListener('load', function(e) {
+    
+            // img要素を作成
+            var img_element = document.createElement('img');
+            img_element.src = e.target.result;
+            img_element.id = "myface";
+    
+            // img要素をページに挿入
+            var article_element = document.getElementById('face_parent');
+            img_element.style = "border-radius: 50%;";
+            img_element.style.width = article_element.style.width;
+            img_element.style.height = article_element.style.height;
+            article_element.append(img_element);
+            });
+    
+            // ファイル内容をBase64にエンコードし、「data:〜」で始まるURL形式で取得
+            file_reader.readAsDataURL(e.target.files[0]);
+        });
+    </script>
+
+{% endblock %}

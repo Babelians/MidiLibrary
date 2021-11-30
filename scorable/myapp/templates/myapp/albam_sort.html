@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block home %}
+<div style="margin-top: 50px;"></div>
+<div style="display: flex;">
+    <div style="font-size: 20px;"><a href="{% url 'user_detail' pk=my.pk %}">アップロード順</a></div>
+    <div style="font-size: 20px; margin-left: 20px;">アルバム</div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'user_likes' pk=my.pk %}">お気に入り</a></div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'user_follows' pk=my.pk %}">フォロー</a></div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'user_explanation' pk=my.pk %}">プロフィール</a></div>
+</div>
+<div class="user_detail_border">
+    {% for albam, scores in albams.items %}
+    <div class="post" style="width: 100%; display: flex; border-bottom: 1px groove rgb(206, 206, 206);">
+        <div style="margin: 10px 10px;">
+            <img src="{{ albam.art.url }}" style="width: 200px; height: 200px;"/>
+        </div>
+        <div style="display: block;">
+            <div style="display: flex;">
+                <div style="display: inline-flex; margin-top: 10px; font-size: 20px; margin-left: 10px;">{{ albam.albam_title }}</div>
+                <div style=" width: 50px; margin-top: 10px; margin-left: 20px;"><a href="{% url 'albam_edit' pk=albam.pk %}">編集</a></div>
+            </div>
+            {% for score in scores %}
+            <div style="width: 700px; border-bottom: 1px groove #c9c9c9; font-size: 19px; display: flex;">
+                <div style="width: 25px; text-align: center;">{{forloop.counter}}</div>
+                <div style="width: 200px;"><a href="{% url 'score_detail' pk=score.pk %}" style="margin-left: 10px;">{{ score.song_name }}</a></div>
+                {% if user == my %}
+                <div style="margin: 0 0 0 auto; width: 50px;"><a href="{% url 'score_edit' pk=score.pk %}">編集</a></div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div style="height: 30px; width: 950px;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

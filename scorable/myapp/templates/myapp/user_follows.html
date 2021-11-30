@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block home %}
+<div style="margin-top: 50px;"></div>
+<div style="display: flex;">
+    <div style="font-size: 20px;"><a href="{% url 'user_detail' pk=my.pk %}">アップロード順</a></div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'albam_sort' pk=my.pk %}">アルバム</a></div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'user_likes' pk=my.pk %}">お気に入り</a></div>
+    <div style="font-size: 20px; margin-left: 20px;">フォロー</div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'user_explanation' pk=my.pk %}">プロフィール</a></div>
+</div>
+<div class="user_detail_border">
+    {% for f in follows %}
+    <div class="post" style="width: 100%; height: 70px; display: flex;align-items: center; border-bottom: 1px groove rgb(206, 206, 206);">
+        <a href="{% url 'user_detail' pk=f.follow.pk %}" style="display: flex; align-items: center;">
+            <img src="{{ f.follow.face.url }}" style="width: 45px; height: 45px; border-radius: 50%;vertical-align: middle; margin: 0 0 0 10px;"/>
+            <span style="font-size: 18px; margin: 0 0 0 10px;">{{ f.follow.username }}</span>
+        </a>
+        <div style="margin: 0 0 0 40px; width: 800px; max-height: 70px; overflow: hidden;" >{{ f.follow.explanation }}</div>
+        <form method="POST" id="comment_heart">
+            {% csrf_token %}
+            <button type="submit" class="Follow" id="{{ f.follow.id }}" name="Follow" value="1" style="height: 35px; width: 80px; background-color: rgb(150, 150, 150); margin: 15px 20px 0 auto;">
+                Following
+            </button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+    <script>
+        let Follows = document.getElementsByClassName("Follow");
+        for(let i=0;i<Follows.length;i++){
+            Follows[i].addEventListener('click', function(e){
+                e.preventDefault();
+                if(parseInt(e.target.value)>0){
+                    let followCount = document.getElementById(e.target.id);
+                    let newText = document.createTextNode("follow");
+                    followCount.firstChild.remove();
+                    followCount.appendChild(newText);
+                    e.target.value = 0;
+                    e.target.style.backgroundColor = "rgb(58, 29, 58)";
+                }else{
+                    let followCount = document.getElementById(e.target.id);
+                    let newText = document.createTextNode("following");
+                    followCount.firstChild.remove();
+                    followCount.appendChild(newText);
+                    e.target.value = 1;
+                    e.target.style.backgroundColor = "rgb(150, 150, 150)";
+                }
+
+                $.ajax({
+                    //サーバに送信するリクエストの設定
+                    'url': '{% url "follow" 1234 %}'.replace(/1234/,parseInt(e.target.id)),
+                    'type': 'POST',
+                    'data': {
+                    },
+                    'dataType': 'json'
+                })
+                .done(function(){
+                    //通信成功時の処理
+                })
+                .fail(function(){
+                    //通信失敗時の処理
+                })
+
+            });
+        }
+    </script>
+
+{% endblock %}

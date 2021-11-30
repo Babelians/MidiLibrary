@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="content">
+    <div class="inner-content" style="margin: 0 auto; width: 1150px;">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: flex; height: 650px; width: 750px; border: 1px groove #c9c9c9; margin: 0 auto;">
+                <div style="background-color: rgb(25, 25, 25); width: 100%;">
+                    <div id="detail" style="margin-left: 5%;">
+
+                    </div>
+                </div>
+            </div>
+            <button type="submit" style="margin-left: 200px;">更新</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    //detail
+    var detail = document.createElement('div');
+    detail.id = "detail";
+    var parent = document.getElementById('detail');
+    parent.appendChild(detail);
+    
+    //song name
+    /*var label_data = document.createElement('label');
+    label_data.htmlFor = 'id_form-'+'-song_name';
+    label_data.innerHTML = "Song name:";
+    var parent = document.getElementById('detail');
+    parent.appendChild(label_data);*/
+
+    var input_data = document.createElement('input');
+    input_data.type = 'text';
+    input_data.name = 'song_name';
+    input_data.id = 'id_song_name';
+    input_data.placeholder = '曲名';
+    input_data.value = '{{ score.song_name }}'
+    input_data.style = "display: block; width: 95%; height: 6%; margin-top: 4%;";
+    input_data.required = true;
+    var parent = document.getElementById('detail');
+    parent.appendChild(input_data);
+
+    //explanation
+
+    var input_data = document.createElement('textarea');
+    //input_data.type = 'text';
+    input_data.name = 'explanation';
+    input_data.id = 'id_explanation';
+    input_data.placeholder = '説明';
+    if('{{score.explanation}}' != 'None'){
+        input_data.value = '{{score.explanation}}';
+    }
+    input_data.style = "display: block; width: 95%; height: 20%;";
+    var parent = document.getElementById('detail');
+    parent.appendChild(input_data);
+
+    //music file
+    let music_parent = document.createElement('div');
+    music_parent.id = "music_parent";
+    music_parent.style = "margin-top: 3%;";
+    parent.appendChild(music_parent);
+
+    let music_label = document.createTextNode("MP3: current:");
+    music_label.textContent += "{{ score.musicfile }}".slice(10);
+    var parent = document.getElementById("music_parent");
+    parent.appendChild(music_label);
+
+    var input_data = document.createElement('input');
+    input_data.type = 'file';
+    input_data.name = 'musicfile';
+    input_data.id = 'id_musicfile';
+    input_data.placeholder = '楽曲の音声ファイル';
+    input_data.accept = ".mp3"
+    input_data.style = "display: block;";
+    //input_data.required = true;
+    var parent = document.getElementById("music_parent");
+    parent.appendChild(input_data);
+
+    //art file
+    /*var label_data = document.createElement('label');
+    label_data.htmlFor = 'id_form-'+'-score_art';
+    label_data.innerHTML = "Score_art:";
+    var parent = document.getElementById('detail');
+    parent.appendChild(label_data);*/
+
+    //art work parent
+    let image_parent = document.createElement('div');
+    image_parent.id = "art_work_parent";
+    image_parent.style = "margin-top: 3%; display: block; align-items: center;";
+    var parent = document.getElementById('detail');
+    parent.appendChild(image_parent);
+
+    let image_label = document.createTextNode("アートワーク");
+    var parent = document.getElementById("art_work_parent");
+    parent.appendChild(image_label);
+
+    //song image rect
+    let song_image = document.createElement('div');
+    song_image.id = "song_image";
+    song_image.style = "width: 150px; height: 150px; border: 1px groove rgb(179, 179, 179); display: flex;";
+    var parent = document.getElementById("art_work_parent");
+    parent.appendChild(song_image);
+
+    //アートワークインプット
+    var input_data = document.createElement('input');
+    input_data.type = 'file';
+    input_data.name = 'score_art';
+    input_data.id = 'id_score_art';
+    input_data.accept = "image/*";
+    input_data.style = "display: flex;";
+    var parent = document.getElementById("art_work_parent");
+    parent.appendChild(input_data);
+
+    input_data.addEventListener('change', function(e){
+
+        if(document.getElementById("s_image")){
+            document.getElementById("s_image").remove();
+        }
+
+        var file_reader = new FileReader();
+
+        file_reader.addEventListener('load', function(e) {
+
+            // img要素を作成
+            var img_element = document.createElement('img');
+            img_element.src = e.target.result;
+            img_element.id = "s_image";
+
+            // img要素をページに挿入
+            var article_element = document.getElementById("song_image");
+            img_element.style.width = "100%";
+            img_element.style.height = "100%";
+            article_element.append(img_element);
+        });
+
+        // ファイル内容をBase64にエンコードし、「data:〜」で始まるURL形式で取得
+        file_reader.readAsDataURL(e.target.files[0]);
+    });
+
+    //アートワークインプット
+    var input_data = document.createElement('img');
+    input_data.type = 'file';
+    input_data.id = 's_image';
+    input_data.style = 'width:100%; height: 100%;';
+    input_data.src = '{{ score.score_art.url }}';
+    var parent = document.getElementById("song_image");
+    parent.appendChild(input_data);
+
+    //タグ
+    let tag_parent = document.createElement("div");
+    tag_parent.id = "tag_parent";
+    tag_parent.style = "margin-top: 3%;";
+    var parent = document.getElementById('detail');
+    parent.appendChild(tag_parent);
+    let tags = ['{{ tags.0 }}', '{{ tags.1 }}', '{{ tags.2 }}', '{{ tags.3 }}',
+                '{{ tags.4 }}','{{ tags.5 }}','{{ tags.6 }}','{{ tags.7 }}',
+                '{{ tags.8 }}','{{ tags.9 }}'];
+    for(let i=0;i<10;i++){
+        //tag name
+        /*var label_data = document.createElement('label');
+        label_data.htmlFor = 'id_form-'+'-tag_name_'+i;
+        label_data.innerHTML = "Tag_name_"+i+":";
+        var parent = document.getElementById('detail');
+        parent.appendChild(label_data);*/
+
+        var input_data = document.createElement('input');
+        input_data.type = 'text';
+        input_data.name = 'form-tag-'+i;
+        input_data.id = 'form-id_tag-'+i;
+        input_data.placeholder = 'タグ'+(i+1);
+        if(tags[i]!='None'){
+            input_data.value = tags[i];
+        }
+        var parent = document.getElementById("tag_parent");
+        parent.appendChild(input_data);
+    }
+
+    //price parent
+    let price_parent = document.createElement("div");
+    price_parent.id = "price_parent";
+    price_parent.style = "margin-top: 3%; display: flex; margin-left:50%;";
+    var parent = document.getElementById('detail');
+    parent.appendChild(price_parent);
+
+    //price label
+    let price_label = document.createTextNode("price : ");
+    var parent = document.getElementById("price_parent");
+    parent.appendChild(price_label);
+
+    //price
+    var input_data = document.createElement('input');
+    input_data.type = 'number';
+    input_data.name = 'price';
+    input_data.id = 'id_price';
+    input_data.value = parseInt('{{ score.price }}');
+    var parent = document.getElementById('price_parent');
+    parent.appendChild(input_data);
+
+    //currency
+    var input_data = document.createTextNode(" {{ currency }}");
+    var parent = document.getElementById('price_parent');
+    parent.appendChild(input_data);
+
+    //albam_num
+    var input_data = document.createElement('input');
+    input_data.type = 'text';
+    input_data.name = 'albam_num';
+    input_data.id = 'id_albam_num';
+    input_data.value = '{{ score.albam_num }}';
+    input_data.style = "display: none;";
+    var parent = document.getElementById('detail');
+    parent.appendChild(input_data);
+</script>
+
+{% endblock %}

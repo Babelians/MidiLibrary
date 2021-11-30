@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="content">
+        <div style="flex-wrap: wrap; margin: 0 auto; width: 1200px;">
+            {% for score, tags in score_dict.items %}
+            <div class="boxA" style="margin-left: 2%; display: flex;">
+                <a href="{% url 'score_detail' pk=score.pk %}"><img src="{{ score.score_art.url }}" style="width: 175px; height: 175px;"/></a>
+                <div style="margin-left: 15px;">
+                    <big>{{ score.song_name }}</big>
+                    {% if score.albam_id %}
+                        <div style="font-size: 15px;">アルバム <a href="{% url 'albam_detail' pk=score.albam_id %}">{{ score.albam.albam_title }}</a></div>
+                    {% endif %}
+                    <div>{{ score.play_count }}回再生・{{ score.uploaded_at }}</div>
+                    <div style="height: 30px; ">
+                        <a href="{% url 'user_detail' pk=score.artist.pk %}">
+                            <img src="{{ score.artist.face.url }}" style="width: 30px; height: 30px; border-radius: 50%;vertical-align: middle;"/>
+                            {{ score.artist.username }}
+                        </a>
+                    </div>
+                    {% for tag in tags %}
+                    {% if tag %}
+                    <a href="{% url 'search' %}?keyword={{ tag }}" style="color: blueviolet;">#{{ tag }}</a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

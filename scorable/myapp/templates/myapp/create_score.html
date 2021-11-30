@@ -1,0 +1,522 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+    <div class="content">
+        <form method="POST" enctype="multipart/form-data">
+            <div style="width: 900px; margin: 0 auto;">
+                {% csrf_token %}
+                <div id="albam_parent">
+                    <button id="add_albam" type="button" class="music_add_btn" onclick="addAlbam()">Add albam</button>
+                    <!--<div id="albam_detail" style="height: 8%; width: 60%; display: flex; width: 60%; border: 1px groove #c9c9c9; border-style: groove groove none groove; align-items: center;">
+                        <div id="albam_image" style="width: 60px; height: 60px; border: 1px groove rgb(179, 179, 179); margin-left: 1%;"></div>
+                    </div> -->
+                </div>
+                <div style="display: flex; height: 650px; width: 900px; border: 1px groove #c9c9c9;">
+                    <ul id="add" style="width: 35%; list-style: none; padding-left: 0%; margin-top: 0%;">
+                        <!--<input type="file" id='id_form-0-midifile' accept=".mid" > -->
+                    </ul>
+    
+                    <div style="background-color: rgb(25, 25, 25); width: 65%;">
+                        <div id="detail" style="margin-left: 5%;">
+                        </div>
+                    </div>
+                </div>
+                    
+                    {{ s_formset.management_form }}
+                <button type="submit">Create Score</button>
+            </div>
+        </form>
+    </div>
+    <script>
+
+        function addAlbam(){
+            document.getElementById("add_albam").style = "display: none;";
+
+            //albam parent
+            let albam_detail = document.createElement('div');
+            albam_detail.id = "albam_detail";
+            albam_detail.style = "height: 90px; display: flex; width: 900px; border: 1px groove #c9c9c9; border-style: groove groove none groove; align-items: center;";
+            var parent = document.getElementById('albam_parent');
+            parent.appendChild(albam_detail);
+
+            //albam image parent
+            let albam_image = document.createElement('div');
+            albam_image.id = "albam_image";
+            albam_image.style = "width: 70px; height: 70px; border: 1px groove rgb(179, 179, 179); margin-left: 10px;";
+            var parent = document.getElementById('albam_detail');
+            parent.appendChild(albam_image);
+
+            //albam art
+            var label_data = document.createElement('label');
+            label_data.htmlFor = 'id_art';
+            label_data.innerHTML = "＋アートワークを追加";
+            label_data.style = "margin-left:20px; color:rgb(150,0,255); text-decoration:underline; cursor : pointer;";
+            var parent = document.getElementById('albam_detail');
+            parent.appendChild(label_data);
+
+            //art work
+            var input_data = document.createElement('input');
+            input_data.type = 'file';
+            input_data.name = 'art';
+            input_data.id = 'id_art';
+            input_data.accept = "image/*";
+            input_data.style = "margin-left: 1%; display:none;"
+            var parent = document.getElementById('albam_detail');
+            parent.appendChild(input_data);
+
+            document.getElementById("id_art").addEventListener('change', function(e){
+
+                if(document.getElementById("image")){
+                    document.getElementById("image").remove();
+                }
+
+                var file_reader = new FileReader();
+
+                file_reader.addEventListener('load', function(e) {
+
+                // img要素を作成
+                var img_element = document.createElement('img');
+                img_element.src = e.target.result;
+                img_element.id = "image";
+
+                // img要素をページに挿入
+                var article_element = document.getElementById('albam_image');
+                img_element.style.width = "100%";
+                img_element.style.height = "100%";
+                article_element.append(img_element);
+                });
+
+                // ファイル内容をBase64にエンコードし、「data:〜」で始まるURL形式で取得
+                file_reader.readAsDataURL(e.target.files[0]);
+            });
+
+
+            //albam name
+
+            var input_data = document.createElement('input');
+            input_data.type = 'text';
+            input_data.name = 'albam_title';
+            input_data.id = 'id_albam_title';
+            input_data.style = 'height: 50%; width: 50%; margin:0 0 0 auto;';
+            input_data.placeholder = "アルバムタイトル";
+            input_data.required = true;
+            var parent = document.getElementById('albam_detail');
+            parent.appendChild(input_data);
+
+            //gomi box
+            let gomiBox = document.createElement("div");
+            gomiBox.id = "gomiBox";
+            gomiBox.style = "width: 3%; height:20%;display: flex; justify-content: center; align-items: center; margin: 0 0 auto auto;";
+            var parent = document.getElementById('albam_detail');
+            parent.appendChild(gomiBox);
+
+            gomiBox.onclick = function(e){
+                document.getElementById("albam_detail").remove();
+                document.getElementById("add_albam").style = "display: block;";
+            }
+
+            //gomi icon
+            let gomi = document.createElement("img");
+            gomi.src = "{% static 'img/gomi.png' %}";
+            gomi.id = "gomi";
+            gomi.style = "height: 100%; width:100%;";
+            gomi.draggable = false;
+            var parent = document.getElementById('gomiBox');
+            parent.appendChild(gomi);
+        }
+
+        let detailNum = -1;
+
+        let musicNum = 0; //ナンバリング
+        let totalNum = 0; //総数
+
+        //midi file
+        var input_data = document.createElement('input');
+        input_data.type = 'file';
+        input_data.name = 'form-'+musicNum+'-midifile';
+        input_data.id = 'id_form-'+musicNum+'-midifile';
+        input_data.style = "display:none;";
+        input_data.accept = '.mid';
+        var parent = document.getElementById('add');
+        parent.appendChild(input_data);
+
+        //midi input label
+        var label_data = document.createElement('label');
+        label_data.htmlFor = 'id_form-'+musicNum+'-midifile';
+        label_data.id = 'id_label-'+musicNum+'-midifile';
+        label_data.innerHTML = "＋Midiファイルを追加";
+        label_data.style = "color:rgb(150,0,255); text-decoration:underline; cursor : pointer; margin-left:5px;";
+        var parent = document.getElementById('add');
+        parent.appendChild(label_data);
+
+        document.getElementById("id_form-"+musicNum+"-midifile").addEventListener('change', function(e){
+            let elements = document.getElementById("id_form-"+musicNum+"-midifile");
+            let mfiles = elements.files;
+            for(let i=0;i<mfiles.length;i++){
+                addMusic(mfiles[i]);
+            }
+        });
+
+        let selectedColor = "rgb(60,60,60)";
+        let notSelectedColor = "rgb(30, 30, 30)";
+
+        function addMusic(file){
+            //フォームを消す
+            let previousForm = document.getElementById("id_label-"+musicNum+"-midifile");
+            previousForm.style.display = 'none';
+
+            //前のdetailを消す
+            if(document.getElementById('detail'+detailNum)){
+                let previousDetail = document.getElementById('detail'+detailNum);
+                previousDetail.style.display = 'none';
+            }
+
+            //前のmidiBoxの色を消す
+            if(document.getElementById("midiBox"+detailNum)){
+                let previousBox = document.getElementById("midiBox"+detailNum);
+                previousBox.style.backgroundColor = notSelectedColor;
+            }
+
+            detailNum = musicNum; //今アップロードされたもの
+
+            //box
+            var midiBox = document.createElement('li');
+            midiBox.id = 'midiBox'+musicNum;
+            midiBox.value = musicNum;
+            midiBox.style = "height: 4%; display: flex;";
+            midiBox.style.backgroundColor = selectedColor;
+            midiBox.draggable = true;
+            var parent = document.getElementById('add');
+            parent.appendChild(midiBox);
+
+            //ドラッグアンドドロップによる入れ替え
+            midiBox.addEventListener("dragstart", function(e){
+                e.dataTransfer.setData('text/plain', e.target.id);
+            });
+
+            midiBox.addEventListener("dragover", function(e){
+                e.preventDefault();
+                this.style.borderTop = '2px solid purple';
+            });
+            midiBox.addEventListener("dragleave", function(e){
+                this.style.borderTop = '';
+            });
+
+            midiBox.addEventListener("drop", function(e){
+                e.preventDefault();
+                let id = e.dataTransfer.getData('text/plain');
+                let elm_drag = document.getElementById(id);
+                this.parentNode.insertBefore(elm_drag, this);
+                this.style.borderTop = '';
+                listNumber(1);
+            });
+
+            function listNumber(n){
+                //albam_numの入れ替え
+                let children = add.getElementsByTagName("li");
+                for(let i=0;i<totalNum;i++){
+                    document.getElementById('id_form-'+children[i].value+'-albam_num').value = i;
+                }
+                if(n==0){//消した後のナンバリング
+                    for(let i=0;i<totalNum;i++){
+                        document.getElementById('id_form-'+children[i].value+'-midifile').name = 'form-'+i+'-midifile';
+                        document.getElementById('id_form-'+children[i].value+'-midifile').id = 'id_form-'+i+'-midifile';
+                        document.getElementById('id_form-'+children[i].value+'-song_name').name = 'form-'+i+'-song_name';
+                        document.getElementById('id_form-'+children[i].value+'-song_name').id = 'id_form-'+i+'-song_name';
+                        document.getElementById('id_form-'+children[i].value+'-explanation').name = 'form-'+i+'-explanation';
+                        document.getElementById('id_form-'+children[i].value+'-explanation').id = 'id_form-'+i+'-explanation';
+                        document.getElementById('id_form-'+children[i].value+'-musicfile').name = 'form-'+i+'-musicfile';
+                        document.getElementById('id_form-'+children[i].value+'-musicfile').id = 'id_form-'+i+'-musicfile';
+                        document.getElementById('id_form-'+children[i].value+'-price').name = 'form-'+i+'-price';
+                        document.getElementById('id_form-'+children[i].value+'-price').id = 'id_form-'+i+'-price';
+                        document.getElementById('id_form-'+children[i].value+'-albam_num').name = 'form-'+i+'-albam_num';
+                        document.getElementById('id_form-'+children[i].value+'-albam_num').id = 'id_form-'+i+'-albam_num';
+                        for(let j=0;j<10;j++){
+                            document.getElementById('id_form-'+children[i].value+'-tag-'+j).name = 'form-'+i+'-tag-'+j;
+                            document.getElementById('id_form-'+children[i].value+'-tag-'+j).id = 'id_form-'+i+'-tag-'+j;
+                        }
+                    }
+                    for(let i=0;i<totalNum;i++){
+                        children[i].value = i;
+                    }
+                }
+            }
+
+            //midi name box
+            let midiNameBox = document.createElement("div");
+            midiNameBox.id = "midiNameBox"+musicNum;
+            midiNameBox.style = "width: 93%; overflow:hidden; display: flex;";
+            midiNameBox.value = musicNum;
+            var parent = document.getElementById('midiBox'+musicNum);
+            parent.appendChild(midiNameBox);
+
+            //midi name
+            let midiName = document.createTextNode(file.name);
+            var parent = document.getElementById('midiNameBox'+musicNum);
+            parent.appendChild(midiName);
+
+            //gomi box
+            let gomiBox = document.createElement("div");
+            gomiBox.id = "gomiBox"+musicNum;
+            gomiBox.style = "width: 6%; display: flex; justify-content: center; align-items: center;";
+            gomiBox.value = musicNum;
+            var parent = document.getElementById('midiBox'+musicNum);
+            parent.appendChild(gomiBox);
+
+            gomiBox.onclick = function(e){
+                document.getElementById("midiBox"+e.target.value).remove();
+                document.getElementById("detail"+e.target.value).remove();
+                document.getElementById("id_form-"+e.target.value+"-midifile").remove();
+                document.getElementById("id_label-"+e.target.value+"-midifile").remove();
+                total(-1);
+                listNumber(0);
+            }
+
+            //gomi icon
+            let gomi = document.createElement("img");
+            gomi.src = "{% static 'img/gomi.png' %}";
+            gomi.id = "gomi"+musicNum;
+            gomi.style = "height: 70%;";
+            gomi.value = musicNum;
+            gomi.draggable = false;
+            var parent = document.getElementById('gomiBox'+musicNum);
+            parent.appendChild(gomi);
+
+            //detail
+            var detail = document.createElement('div');
+            detail.id = "detail"+musicNum;
+            var parent = document.getElementById('detail');
+            parent.appendChild(detail);
+            
+            //song name
+            var input_data = document.createElement('input');
+            input_data.type = 'text';
+            input_data.name = 'form-'+musicNum+'-song_name';
+            input_data.id = 'id_form-'+musicNum+'-song_name';
+            input_data.placeholder = '曲名';
+            input_data.style = "display: block; width: 95%; height: 6%; margin-top: 4%;";
+            input_data.required = true;
+            var parent = document.getElementById('detail'+musicNum);
+            input_data.value = file.name.slice(0, -4);
+            parent.appendChild(input_data);
+
+            //explanation
+            var input_data = document.createElement('textarea');
+            //input_data.type = 'text';
+            input_data.name = 'form-'+musicNum+'-explanation';
+            input_data.id = 'id_form-'+musicNum+'-explanation';
+            input_data.placeholder = '説明';
+            input_data.style = "display: block; width: 95%; height: 20%;";
+            var parent = document.getElementById('detail'+musicNum);
+            parent.appendChild(input_data);
+
+            //music file
+            let music_parent = document.createElement('div');
+            music_parent.id = "music_parent"+musicNum;
+            music_parent.style = "margin-top: 3%;";
+            parent.appendChild(music_parent);
+            /*var label_data = document.createElement('label');
+            label_data.htmlFor = 'id_form-'+musicNum+'-musicfile';
+            label_data.innerHTML = "music file:";
+            var parent = document.getElementById('detail'+musicNum);
+            parent.appendChild(label_data);*/
+            let music_label = document.createTextNode("MP3");
+            var parent = document.getElementById("music_parent"+musicNum);
+            parent.appendChild(music_label);
+
+            var input_data = document.createElement('input');
+            input_data.type = 'file';
+            input_data.name = 'form-'+musicNum+'-musicfile';
+            input_data.id = 'id_form-'+musicNum+'-musicfile';
+            input_data.placeholder = '楽曲の音声ファイル';
+            input_data.accept = ".mp3"
+            input_data.style = "display: block;";
+            input_data.required = true;
+            var parent = document.getElementById("music_parent"+musicNum);
+            parent.appendChild(input_data);
+
+            //art file
+            /*var label_data = document.createElement('label');
+            label_data.htmlFor = 'id_form-'+musicNum+'-score_art';
+            label_data.innerHTML = "Score_art:";
+            var parent = document.getElementById('detail'+musicNum);
+            parent.appendChild(label_data);*/
+
+            //art work parent
+            let image_parent = document.createElement('div');
+            image_parent.id = "art_work_parent"+musicNum;
+            image_parent.style = "margin-top: 3%; display: block; align-items: center;";
+            var parent = document.getElementById('detail'+musicNum);
+            parent.appendChild(image_parent);
+
+            let image_label = document.createTextNode("アートワーク");
+            var parent = document.getElementById("art_work_parent"+musicNum);
+            parent.appendChild(image_label);
+
+            //song image rect
+            let song_image = document.createElement('div');
+            song_image.id = "song_image"+musicNum;
+            song_image.style = "width: 150px; height: 150px; border: 1px groove rgb(179, 179, 179); display: flex;";
+            var parent = document.getElementById("art_work_parent"+musicNum);
+            parent.appendChild(song_image);
+
+            //アートワークインプット
+            var input_data = document.createElement('input');
+            input_data.type = 'file';
+            input_data.name = 'form-'+musicNum+'-score_art';
+            input_data.id = 'id_form-'+musicNum+'-score_art';
+            input_data.accept = "image/*";
+            input_data.style = "display: flex;";
+            var parent = document.getElementById("art_work_parent"+musicNum);
+            parent.appendChild(input_data);
+
+            input_data.addEventListener('change', function(e){
+
+                if(document.getElementById("s_image"+detailNum)){
+                    document.getElementById("s_image"+detailNum).remove();
+                }
+
+                var file_reader = new FileReader();
+
+                file_reader.addEventListener('load', function(e) {
+
+                    // img要素を作成
+                    var img_element = document.createElement('img');
+                    img_element.src = e.target.result;
+                    img_element.id = "s_image"+detailNum;
+
+                    // img要素をページに挿入
+                    var article_element = document.getElementById("song_image"+detailNum);
+                    img_element.style.width = "100%";
+                    img_element.style.height = "100%";
+                    article_element.append(img_element);
+                });
+
+                // ファイル内容をBase64にエンコードし、「data:〜」で始まるURL形式で取得
+                file_reader.readAsDataURL(e.target.files[0]);
+            });
+
+            //タグ
+            let tag_parent = document.createElement("div");
+            tag_parent.id = "tag_parent"+musicNum;
+            tag_parent.style = "margin-top: 3%;";
+            var parent = document.getElementById('detail'+musicNum);
+            parent.appendChild(tag_parent);
+            for(let i=0;i<10;i++){
+                var input_data = document.createElement('input');
+                input_data.type = 'text';
+                input_data.name = 'form-'+musicNum+'-tag-'+i;
+                input_data.id = 'id_form-'+musicNum+'-tag-'+i;
+                input_data.placeholder = 'タグ'+(i+1);
+                var parent = document.getElementById("tag_parent"+musicNum);
+                parent.appendChild(input_data);
+            }
+
+            //price parent
+            let price_parent = document.createElement("div");
+            price_parent.id = "price_parent"+musicNum;
+            price_parent.style = "margin-top: 3%; display: flex; margin-left:50%;";
+            var parent = document.getElementById('detail'+musicNum);
+            parent.appendChild(price_parent);
+
+            //price label
+            let price_label = document.createTextNode("price : ");
+            var parent = document.getElementById("price_parent"+musicNum);
+            parent.appendChild(price_label);
+
+            //price
+            var input_data = document.createElement('input');
+            input_data.type = 'number';
+            input_data.min = 0;
+            input_data.name = 'form-'+musicNum+'-price';
+            input_data.id = 'id_form-'+musicNum+'-price';
+            input_data.value = 0;
+            var parent = document.getElementById('price_parent'+musicNum);
+            parent.appendChild(input_data);
+
+            //currency
+            var input_data = document.createTextNode(" {{ currency }}");
+            var parent = document.getElementById('price_parent'+musicNum);
+            parent.appendChild(input_data);
+
+            //albam_num
+            var input_data = document.createElement('input');
+            input_data.type = 'text';
+            input_data.name = 'form-'+musicNum+'-albam_num';
+            input_data.id = 'id_form-'+musicNum+'-albam_num';
+            input_data.value = musicNum;
+            input_data.style = "display: none;";
+            var parent = document.getElementById('detail'+musicNum);
+            parent.appendChild(input_data);
+
+            musicNum += 1;
+
+            function total(num){
+                totalNum += num;
+                let total_music = document.getElementById("id_form-TOTAL_FORMS");
+                total_music.value = totalNum ;
+            }
+
+            total(+1);
+            listNumber(0);
+
+            midiNameBox.onclick = function(e){
+                if(document.getElementById("detail"+detailNum)){
+                    var detail = document.getElementById("detail"+detailNum);
+                    detail.style.display = 'none';
+                }
+                if(document.getElementById("midiBox"+detailNum)){
+                    let previousBox = document.getElementById("midiBox"+detailNum);
+                    previousBox.style.backgroundColor = notSelectedColor;
+                }
+                detailNum = e.target.value;
+                if(document.getElementById("detail"+detailNum)){
+                    var detail = document.getElementById("detail"+detailNum);
+                    detail.style.display = 'block';
+                }
+                if(document.getElementById("midiBox"+detailNum)){
+                    let nowBox = document.getElementById("midiBox"+detailNum);
+                    nowBox.style.backgroundColor = selectedColor;
+                }
+            }
+
+            //midi file
+
+            var input_data = document.createElement('input');
+            input_data.type = 'file';
+            input_data.name = 'form-'+musicNum+'-midifile';
+            input_data.id = 'id_form-'+musicNum+'-midifile';
+            input_data.style = "display:none;";
+            input_data.accept = '.mid';
+            var parent = document.getElementById('add');
+            parent.appendChild(input_data);
+
+            //midi input label
+            var label_data = document.createElement('label');
+            label_data.htmlFor = 'id_form-'+musicNum+'-midifile';
+            label_data.id = 'id_label-'+musicNum+'-midifile';
+            label_data.innerHTML = "＋Midiファイルを追加";
+            label_data.style = "color:rgb(150,0,255); text-decoration:underline; cursor : pointer; margin-left:5px;";
+            var parent = document.getElementById('add');
+            parent.appendChild(label_data);
+
+            document.getElementById("id_form-"+musicNum+"-midifile").addEventListener('change', function(e){
+                let elements = document.getElementById("id_form-"+musicNum+"-midifile");
+                let mfiles = elements.files;
+                for(let i=0;i<mfiles.length;i++){
+                    addMusic(mfiles[i]);
+                }
+            });
+
+        }
+
+        /*document.getElementById("id_form-"+musicNum+"-midifile").addEventListener('change', function(e){
+            let elements = document.getElementById("id_form-"+musicNum+"-midifile");
+            let mfiles = elements.files;
+            for(let i=0;i<mfiles.length;i++){
+                addMusic(mfiles[i]);
+            }
+        });*/
+    </script>
+{% endblock %}

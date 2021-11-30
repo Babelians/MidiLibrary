@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block home %}
+<div style="margin-top: 50px;"></div>
+<div style="display: flex;">
+    <div style="font-size: 20px;"><a href="{% url 'user_detail' pk=my.pk %}">アップロード順</a></div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'albam_sort' pk=my.pk %}">アルバム</a></div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'user_likes' pk=my.pk %}">お気に入り</a></div>
+    <div style="font-size: 20px; margin-left: 20px;"><a href="{% url 'user_follows' pk=my.pk %}">フォロー</a></div>
+    <div style="font-size: 20px; margin-left: 20px;">プロフィール</div>
+</div>
+    <div class="user_detail_border">
+        <div style="width: 95%; margin: 0 auto; margin-top: 10px;">
+            <div style="font-size: 19px;">説明</div>
+            <div style="margin-top: 10px;">{{ my.explanation|linebreaksbr }}</div>
+           <div style="font-size: 15px; margin-top: 20px;">登録日 : {{ my.date_joined }}</div>
+        </div>
+    </div>
+
+
+    <script>
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="content">
+        <div style="flex-wrap: wrap; margin: 0 auto; width: 1200px;">
+            <!-- admax -->
+            <div style="width: 729px; margin: 0 auto;">
+                <script src="https://adm.shinobi.jp/s/73eb1cc90ab2bcea0845a5e3ef329f86"></script>
+            </div>
+            <!-- admax -->
+            <div style="height: 60px;"></div>
+            {% if follow_scores %}
+            <div style="margin-left: 25px; font-size: 22px;">フォロー中のユーザー</div>
+            <div style="display: flex; flex-wrap: wrap; margin-top: 16px;">
+                {% for post in follow_scores %}
+                <div style="display: inline; margin-left: 25px;">
+                    <div class="post">
+                        <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 175px; height: 175px;"/></a>
+                    </div>
+                    <div style="width: 175px; height: 20px; max-height: 50px;overflow: hidden; margin-top: 4px; font-size: 14px">
+                        {{ post.song_name }}
+                    </div>
+                    <div style="height: 29px; margin-top: 3px; overflow: hidden;">
+                        <a href="{% url 'user_detail' pk=post.artist.pk %}">
+                            <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
+                            <span style="font-size: 14px; margin-left: 2px;">{{ post.artist.username }}</span>
+                        </a>
+                    </div>
+                    <br>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="margin-top:80px;"></div>
+            {% endif %}
+
+            {% if recommend_scores %}
+            <div style="margin-left: 25px; font-size: 22px;">おすすめ</div>
+            <div style="display: flex; flex-wrap: wrap; margin-top: 16px;">
+                {% for post in recommend_scores %}
+                <div style="display: inline; margin-left: 25px;">
+                    <div class="post">
+                        <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 175px; height: 175px;"/></a>
+                    </div>
+                    <div style="width: 175px; height: 20px; max-height: 50px;overflow: hidden; margin-top: 4px; font-size: 14px">
+                        {{ post.song_name }}
+                    </div>
+                    <div style="height: 29px; margin-top: 3px; overflow: hidden;">
+                        <a href="{% url 'user_detail' pk=post.artist.pk %}">
+                            <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
+                            <span style="font-size: 14px; margin-left: 2px;">{{ post.artist.username }}</span>
+                        </a>
+                    </div>
+                    <br>
+                </div>
+                {% endfor %}
+
+                <!-- admax -->
+                <div style="margin: 0 0 0 auto;">
+                    <script src="https://adm.shinobi.jp/s/ae42942d8cca6f932753e8531586248c"></script>
+                </div>
+                <!-- admax -->
+
+            </div>
+            {% endif %}
+
+            <div style="margin-top:80px;"></div>
+
+        {% for t, scores in scores_tag.items %}
+            <div style="margin-left: 25px; font-size: 22px;"><a href="{% url 'search' %}?keyword={{t.name}}" style="color: blueviolet;">#{{ t.name }}</a></div>
+            <div style="display: flex; flex-wrap: wrap; margin-top: 16px;">
+                {% for post in scores %}
+                <div style="display: inline; margin-left: 25px;">
+                    <div class="post">
+                        <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 175px; height: 175px;"/></a>
+                    </div>
+                    <div style="width: 175px; height: 20px; max-height: 50px;overflow: hidden; margin-top: 4px; font-size: 14px">
+                        {{ post.song_name }}
+                    </div>
+                    <div style="height: 29px; margin-top: 3px; overflow: hidden;">
+                        <a href="{% url 'user_detail' pk=post.artist.pk %}">
+                            <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
+                            <span style="font-size: 14px; margin-left: 2px;">{{ post.artist.username }}</span>
+                        </a>
+                    </div>
+                    <br>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="margin-top:70px;"></div>
+        {% endfor %} 
+        </div>
+    </div>
+{% endblock %}

@@ -765,7 +765,7 @@
                             for(let i=0;i<piakey[k].length;i++){ //鍵盤別
                                 piakey[k][i] = 0;
                                 for(let j=0;j<note[k+1].length;j++){
-                                    if(i==note[k+1][j][1]-24+3&&note[k+1][j][0]<=notePos&&note[k+1][j][3]>notePos+60){ //-24+3はピアノ上の左端のド 最後の+は離鍵を表現
+                                    if(i==note[k+1][j][1]-24+3&&note[k+1][j][0]<=notePos&&note[k+1][j][3]>notePos){ //-24+3はピアノ上の左端のド
                                         piakey[k][note[k+1][j][1]-24+3] = 1;
                                         break;
                                     }

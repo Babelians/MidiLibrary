@@ -266,11 +266,10 @@ def score_detail(request, pk):
     recommend_byAlbam = Score.objects.filter(albam=score.albam, albam_num=score.albam_num+1)
     recommend_byTag = score_to_score_byTags(score)
     
-    """if request.user.id:
+    if request.user.id:
         purchased = Score_buying_history.objects.filter(score_id=score.id, user_id=request.user.id)
-    else:"""
-        
-    purchased = False
+    else:
+        purchased = False
 
     account = stripe.Account.retrieve(score.artist.stripe_id)
 
@@ -280,7 +279,7 @@ def score_detail(request, pk):
         currency = 'usd'
 
     posts = Comment.objects.filter(song_id=pk).order_by('-heart_count')
-    if False:#request.user.id: #ログインしてるか
+    if request.user.id: #ログインしてるか
         song_heart = Song_heart.objects.filter(song_id=pk, user_id=request.user)
         song_heart_mycount = song_heart.count()
         follow_mycount = Follow.objects.filter(follow_id=score.artist.id, user_id=request.user).count()

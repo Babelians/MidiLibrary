@@ -138,7 +138,7 @@
                         <!--編集-->
                         {% if my == user %}
                         <a href="{% url 'user_edit' pk=user.pk %}" style="margin-left: 30px;">edit</a>
-                        {% else %}
+                        {% elif user.id %}
                         <button type="submit" id="Follow" name="Follow" style="margin: 0 0 0 auto; width: 120px; height: 40px;">
                             <div id="following" style="display: none;">Following</div>
                             <div id="notfollow" style="display: none;">Follow</div>

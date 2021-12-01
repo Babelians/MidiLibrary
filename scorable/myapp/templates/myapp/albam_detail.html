@@ -14,7 +14,9 @@
                 <div style="display: block; margin-left: 20px;">
                     <div style="display: flex; margin-top: 10px;">
                         <div style="width:100%; font-size: 30px;">{{ albam.albam_title }}</div>
-                        <div style="margin: 0 0 0 auto; width: 50px;"><a href="{% url 'albam_edit' pk=albam.pk %}">edit</a></div>
+                        {% if user == my %}
+                        <div style="margin: 0 0 0 auto; width: 50px;"><a href="{% url 'albam_edit' pk=albam.pk %}">編集</a></div>
+                        {% endif %}
                     </div>
                     <a href="{% url 'user_detail' pk=albam.artist.pk %}">
                         <img src="{{ albam.artist.face.url }}" style="width: 23px; height: 23px; border-radius: 50%;vertical-align: middle;"/>

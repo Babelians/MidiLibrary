@@ -18,7 +18,9 @@
         <div style="display: block;">
             <div style="display: flex;">
                 <div style="display: inline-flex; margin-top: 10px; font-size: 20px; margin-left: 10px;">{{ albam.albam_title }}</div>
+                {% if user == my %}
                 <div style=" width: 50px; margin-top: 10px; margin-left: 20px;"><a href="{% url 'albam_edit' pk=albam.pk %}">編集</a></div>
+                {% endif %}
             </div>
             {% for score in scores %}
             <div style="width: 700px; border-bottom: 1px groove #c9c9c9; font-size: 19px; display: flex;">

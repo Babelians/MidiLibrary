@@ -13,17 +13,17 @@
             <div style="margin-left: 25px; font-size: 22px;">フォロー中のユーザー</div>
             <div style="display: flex; flex-wrap: wrap; margin-top: 16px;">
                 {% for post in follow_scores %}
-                <div style="display: inline; margin-left: 25px;">
+                <div style="display: inline; margin-left: 25px; width: 175px;">
                     <div class="post">
                         <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 175px; height: 175px;"/></a>
                     </div>
                     <div style="width: 175px; height: 20px; max-height: 50px;overflow: hidden; margin-top: 4px; font-size: 14px">
                         {{ post.song_name }}
                     </div>
-                    <div style="height: 29px; margin-top: 3px; overflow: hidden;">
+                    <div style="margin-top: 3px; overflow: hidden;">
                         <a href="{% url 'user_detail' pk=post.artist.pk %}" style="display: flex;">
                             <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
-                            <div style="font-size: 14px; margin-left: 2px; width: 50px;">{{ post.artist.username }}</div>
+                            <div style="font-size: 14px; margin-left: 2px; height: 14px;">{{ post.artist.username }}</div>
                         </a>
                     </div>
                     <br>
@@ -37,17 +37,17 @@
             <div style="margin-left: 25px; font-size: 22px;">おすすめ</div>
             <div style="display: flex; flex-wrap: wrap; margin-top: 16px;">
                 {% for post in recommend_scores %}
-                <div style="display: inline; margin-left: 25px;">
+                <div style="display: inline; margin-left: 25px; width: 175px;">
                     <div class="post">
                         <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 175px; height: 175px;"/></a>
                     </div>
                     <div style="width: 175px; height: 20px; max-height: 50px;overflow: hidden; margin-top: 4px; font-size: 14px">
                         {{ post.song_name }}
                     </div>
-                    <div style="height: 29px; margin-top: 3px; overflow: hidden;">
+                    <div style="margin-top: 3px; overflow: hidden;">
                         <a href="{% url 'user_detail' pk=post.artist.pk %}" style="display: flex;">
                             <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
-                            <div style="font-size: 14px; margin-left: 2px; width: 50px;">{{ post.artist.username }}</div>
+                            <div style="font-size: 14px; margin-left: 2px; height: 14px;">{{ post.artist.username }}</div>
                         </a>
                     </div>
                     <br>
@@ -69,17 +69,17 @@
             <div style="margin-left: 25px; font-size: 22px;"><a href="{% url 'search' %}?keyword={{t.name}}" style="color: blueviolet;">#{{ t.name }}</a></div>
             <div style="display: flex; flex-wrap: wrap; margin-top: 16px;">
                 {% for post in scores %}
-                <div style="display: inline; margin-left: 25px;">
+                <div style="display: inline; margin-left: 25px; width: 175px;">
                     <div class="post">
                         <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 175px; height: 175px;"/></a>
                     </div>
                     <div style="width: 175px; height: 20px; max-height: 50px;overflow: hidden; margin-top: 4px; font-size: 14px">
                         {{ post.song_name }}
                     </div>
-                    <div style="height: 29px; margin-top: 3px; overflow: hidden;">
+                    <div style="margin-top: 3px; overflow: hidden;">
                         <a href="{% url 'user_detail' pk=post.artist.pk %}" style="display: flex;">
                             <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
-                            <div style="font-size: 14px; margin-left: 2px; width: 50px;">{{ post.artist.username }}</div>
+                            <div style="font-size: 14px; margin-left: 2px; height: 14px;">{{ post.artist.username }}</div>
                         </a>
                     </div>
                     <br>

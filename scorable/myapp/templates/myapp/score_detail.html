@@ -67,7 +67,7 @@
             </div>
 
             <div style="margin-top: 15px;">
-                <div style="width: 15%; overflow: hidden; font-size: 20px;">
+                <div style="overflow: hidden; font-size: 20px;">
                     {{ score.song_name }}
                 </div>
                 <div id=seekbox>
@@ -1007,10 +1007,14 @@
             <div class="comment">
                 <span style="display: flex; height: 50px;">
                     <span style="font-size: 15px;">{{ score.play_count }}Play</span>
+                    {% if user.id %}
                     <form method="POST" id="score_heart">
                     {% csrf_token %}
                     <button type="submit" id="Like" name="Like">Like</button>
                     </form>
+                    {% else %}
+                    <span>Like</span>
+                    {% endif %}
                     <div id="scoreHeartCount">{{ score.heart_count }}</div>
                     {% if not score.price or purchased %}
                     <a href="{{ score.midifile.url }}">Download</a>
@@ -1045,10 +1049,12 @@
                             <div style="margin-left: 3px;">{{ score.artist.username }}</div>
                             <div style="display: flex; font-size: 12px;">フォロワー<div id="followCount">{{ score.artist.subscriber }}</div></div>
                         </div>
+                        {% if user.id %}
                         <button type="submit" id="Follow" name="Follow" style="margin: 0 0 0 auto; width: 120px; height: 40px;">
                             <div id="following" style="display: none;">Following</div>
                             <div id="notfollow" style="display: none;">Follow</div>
                         </button>
+                        {% endif %}
                     </div>
 
                     <div style="margin-top: 8px; margin-left: 40px;">
@@ -1095,11 +1101,13 @@
                             <span style="color: rgb(122, 122, 122); font-size: 14px">{{ post.uploaded_at }}</span>
                             <div style="font-size: 16px;">{{ post.content|linebreaksbr }}</div>
                             <span style="display: flex;">
+                                {% if user.id %}
                                 <form method="POST" id="comment_heart">
                                 {% csrf_token %}
                                 <button type="submit" class="LikeC" id="{{ post.id }}" name="LikeC" value="{{ post.my_heart }}">Like</button>
                                 </form>
                                 <div id="LikeCSum{{ post.id }}" style="margin-left: 8px;">{{ post.heart_count }}</div>
+                                {% endif %}
                             </span>
                         </div>
                     </div>
@@ -1313,13 +1321,13 @@
             <div class="post" style="display: flex; margin-top: 10px;">
                 <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 140px; height: 90px;"/></a>
                 <div style="margin-left: 5px; word-break: break-all; overflow:hidden;">
-                    <div style="height: 50px; font-size: 15px; flex-wrap: wrap;">
+                    <div style="max-height: 50px; font-size: 15px; flex-wrap: wrap; overflow: hidden;">
                         <a href="{% url 'score_detail' pk=post.pk %}" style="color: white;">{{ post.song_name }}</a>
                     </div>
-                    <div style="height: 20px; font-size: 13px;">
+                    <div style="height: 20px; font-size: 13px; overflow: hidden;">
                         <a href="{% url 'user_detail' pk=post.artist.pk %}">{{ post.artist.username }}</a>
                     </div>
-                    <div style="height: 20px; font-size: 13px; color: darkgray;">
+                    <div style="height: 20px; font-size: 13px; color: darkgray; overflow: hidden;">
                         {{ post.play_count }}回再生
                     </div>
                 </div>
@@ -1332,13 +1340,13 @@
             <div class="post" style="display: flex; margin-top: 10px;">
                 <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 140px; height: 90px;"/></a>
                 <div style="margin-left: 5px; word-break: break-all; overflow:hidden;">
-                    <div style="height: 50px; font-size: 15px; flex-wrap: wrap;">
+                    <div style="max-height: 50px; font-size: 15px; flex-wrap: wrap; overflow: hidden;">
                         <a href="{% url 'score_detail' pk=post.pk %}" style="color: white;">{{ post.song_name }}</a>
                     </div>
-                    <div style="height: 20px; font-size: 13px;">
+                    <div style="height: 20px; font-size: 13px; overflow:hidden;">
                         <a href="{% url 'user_detail' pk=post.artist.pk %}">{{ post.artist.username }}</a>
                     </div>
-                    <div style="height: 20px; font-size: 13px; color: darkgray;">
+                    <div style="height: 20px; font-size: 13px; color: darkgray; overflow: hidden;">
                         {{ post.play_count }}回再生
                     </div>
                 </div>
@@ -1350,13 +1358,13 @@
             <div class="post" style="display: flex; margin-top: 10px;">
                 <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 140px; height: 90px;"/></a>
                 <div style="margin-left: 5px; word-break: break-all; overflow:hidden;">
-                    <div style="height: 50px; font-size: 14px; flex-wrap: wrap;">
-                        <a href="{% url 'score_detail' pk=post.pk %}">{{ post.song_name }}</a>
+                    <div style="max-height: 50px; font-size: 15px; flex-wrap: wrap; overflow: hidden;">
+                        <a href="{% url 'score_detail' pk=post.pk %}" style="color: white;">{{ post.song_name }}</a>
                     </div>
-                    <div style="height: 20px; font-size: 13px;">
+                    <div style="height: 20px; font-size: 13px; overflow:hidden;">
                         <a href="{% url 'user_detail' pk=post.artist.pk %}">{{ post.artist.username }}</a>
                     </div>
-                    <div style="height: 20px; font-size: 13px; color: darkgray;">
+                    <div style="height: 20px; font-size: 13px; color: darkgray; overflow: hidden;">
                         {{ post.play_count }}回再生
                     </div>
                 </div>

@@ -21,9 +21,9 @@
                         {{ post.song_name }}
                     </div>
                     <div style="height: 29px; margin-top: 3px; overflow: hidden;">
-                        <a href="{% url 'user_detail' pk=post.artist.pk %}">
+                        <a href="{% url 'user_detail' pk=post.artist.pk %}" style="display: flex;">
                             <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
-                            <span style="font-size: 14px; margin-left: 2px;">{{ post.artist.username }}</span>
+                            <div style="font-size: 14px; margin-left: 2px; width: 50px;">{{ post.artist.username }}</div>
                         </a>
                     </div>
                     <br>
@@ -45,9 +45,9 @@
                         {{ post.song_name }}
                     </div>
                     <div style="height: 29px; margin-top: 3px; overflow: hidden;">
-                        <a href="{% url 'user_detail' pk=post.artist.pk %}">
+                        <a href="{% url 'user_detail' pk=post.artist.pk %}" style="display: flex;">
                             <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
-                            <span style="font-size: 14px; margin-left: 2px;">{{ post.artist.username }}</span>
+                            <div style="font-size: 14px; margin-left: 2px; width: 50px;">{{ post.artist.username }}</div>
                         </a>
                     </div>
                     <br>
@@ -77,9 +77,9 @@
                         {{ post.song_name }}
                     </div>
                     <div style="height: 29px; margin-top: 3px; overflow: hidden;">
-                        <a href="{% url 'user_detail' pk=post.artist.pk %}">
+                        <a href="{% url 'user_detail' pk=post.artist.pk %}" style="display: flex;">
                             <img src="{{ post.artist.face.url }}" style="width: 24px; height: 24px; border-radius: 50%;vertical-align: middle;"/>
-                            <span style="font-size: 14px; margin-left: 2px;">{{ post.artist.username }}</span>
+                            <div style="font-size: 14px; margin-left: 2px; width: 50px;">{{ post.artist.username }}</div>
                         </a>
                     </div>
                     <br>

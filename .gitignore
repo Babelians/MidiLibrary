@@ -4,5 +4,5 @@
 __pycache__
 myvenv
 #/scorable/static
-#/scorable/media
+/scorable/media
 .DS_Store

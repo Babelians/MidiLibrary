@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="content">
+        <div style="flex-wrap: wrap; margin: 0 auto; width: 1200px;">
+            <!-- admax -->
+            <div style="width: 729px; margin: 0 auto;">
+                <script src="https://adm.shinobi.jp/s/73eb1cc90ab2bcea0845a5e3ef329f86"></script>
+            </div>
+            <!-- admax -->
+            <div style="height: 60px;"></div>
+            <div style="border: 1px solid white; width: 100%;">
+                <div style="font-size:22px; margin: 0 auto; width: 100px;">お知らせ</div>
+            </div>
+            {% for n in notice %}
+            <a href="{% url 'notice_detail' n.id %}">
+                <div style="border-left: 1px solid white;border-right: 1px solid white;border-bottom: 1px solid white; align-items: center;">
+                    <div style="width: 98%; margin: 0 auto; font-size: 20px;">
+                        {{ n.title }}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

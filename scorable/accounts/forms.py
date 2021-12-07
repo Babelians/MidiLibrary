@@ -20,6 +20,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
 
 from .models import CustomUser
+from myapp.models import Notice
 
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -190,6 +191,9 @@ def activate_user(uidb64, token):
         )
         user.stripe_id = account.id
         user.save()
+
+        Notice.objects.create(user=user, title="収益を受け取るために「売上」欄から口座登録してください。",
+            content="Midiデータを販売する場合、メニュー欄の「売上」から口座登録をお願いします。\n登録されなかった場合、発生した収益を受け取れませんのでご注意ください。" )
         return True
     
     return False

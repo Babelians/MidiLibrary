@@ -12,7 +12,12 @@
 <div class="user_detail_border">
     {% for post in posts %}
     <div class="post" style="width: 100%; height: 70px; display: flex;align-items: center; border-bottom: 1px groove rgb(206, 206, 206);">
-        <a href="{% url 'score_detail' pk=post.song.pk %}"><img src="{{ post.song.score_art.url }}" style="width: 60px; height: 60px; margin-left: 5px;"/></a>
+        <a href="{% url 'score_detail' pk=post.pk %}">
+            <div style="overflow: hidden; position: relative; width: 106px; height: 60px; margin-left: 5px; display: flex; align-items: center; justify-content: center;">
+                <img src="{{ post.song.score_art.url }}" style="height: 60px; position: absolute;"/>
+                <img src="{{ post.song.score_art.url }}" style="height: 6000px;"/>
+            </div>
+        </a>
         <div style="margin-left: 10px; width: 300px; overflow: hidden;"><a href="{% url 'score_detail' pk=post.song.pk %}">{{ post.song.song_name }}</a></div>
         <a href="{% url 'user_detail' pk=post.song.artist.pk %}">
             <img src="{{ post.song.artist.face.url }}" style="width: 23px; height: 23px; border-radius: 50%;vertical-align: middle;"/>

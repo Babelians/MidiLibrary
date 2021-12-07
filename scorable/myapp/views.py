@@ -4,7 +4,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from stripe.api_resources import source
-from .models import Albam, Score, Comment, Score_buying_history, Song_heart, Comment_heart, Follow, Tag
+from .models import Albam, Score, Comment, Score_buying_history, Song_heart, Comment_heart, Follow, Tag, Notice
 from .forms import AlbamForm, ScoreForm, ScoreFormSet, TagsInlineFormSet, UserEditForm, CommentForm, SongHeartForm, CommentHeartForm, FollowForm
 from accounts.models import CustomUser
 from accounts.forms import CustomUser
@@ -20,11 +20,34 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 range_10 = [i for i in range(10)]
 range_100 = [i for i in range(100)]
 
+def base_notice(request):
+    if request.user.id:
+        notices = Notice.objects.filter(user=request.user).order_by('uploaded_at')
+        titles = list()
+        i = 0
+        for notice in notices:
+            titles.append([])
+            titles[i].append(notice.id)
+            titles[i].append(notice.title)
+            i += 1
+        d = {
+            'titles':titles,
+        }
+        return JsonResponse(d)
+
+def notice_detail(request, pk):
+    notice = Notice.objects.get(pk=pk)
+    return render(request, 'myapp/notice_detail.html',{'notice':notice,})
+
+def notice(request, pk):
+    notice = Notice.objects.filter(user=pk).order_by('uploaded_at')
+    return render(request, 'myapp/notice.html',{'notice':notice,})
+
 def index(request):
     if request.user.id:
         user = CustomUser.objects.get(pk=request.user.id)
-        follow_scores = search_byFollow(user)[:6]
-        recommend_scores = search_byLike_fromTag(user)[:10]
+        follow_scores = search_byFollow(user)[:4]
+        recommend_scores = search_byLike_fromTag(user)[:11]
     else:
         user = False
         follow_scores = False
@@ -430,8 +453,7 @@ def score_detail(request, pk):
                     break
 
     return render(request, 'myapp/score_detail.html', {
-        'score': score, 
-        'score_art': score.score_art,
+        'score': score,
         'explanation': score.explanation,
         'midhead': midhead,
         'mid_h_data': mid_h_data,
@@ -547,22 +569,20 @@ def addTag_byScore(request, score, n):
 
 def score_edit(request, pk):
     score = Score.objects.get(pk=pk)
-
-    if request.method == 'POST':
-        addTag_byScore(request, score, -1)
-        form = ScoreForm(request.POST, request.FILES, instance=score)
-        if form.is_valid():
-            form.save()
-            addTag_byScore(request, score, 1)
-        return redirect('user_detail', pk=request.user.pk)
-    else:
-        form = ScoreForm(instance=score)
-        if request.user.country == "JP":
-            currency = '円'
-        else:
-            currency = 'usd'
-
     if score.artist.id == request.user.id: #リクエストに不正があるか
+        if request.method == 'POST':
+            addTag_byScore(request, score, -1)
+            form = ScoreForm(request.POST, request.FILES, instance=score)
+            if form.is_valid():
+                form.save()
+                addTag_byScore(request, score, 1)
+            return redirect('user_detail', pk=request.user.pk)
+        else:
+            form = ScoreForm(instance=score)
+            if request.user.country == "JP":
+                currency = '円'
+            else:
+                currency = 'usd'
         return render(request, 'myapp/score_edit.html',{
             'form': form,
             'score': score,
@@ -572,6 +592,56 @@ def score_edit(request, pk):
     else:
         return render(request, 'myapp/none.html',{})
 
+def deleteScore(score):
+    """face_path = os.path.join(MEDIA_ROOT, str(my.face))
+    art_path = os.path.join(MEDIA_ROOT, str(score.score_art))"""
+    audio_path = os.path.join(MEDIA_ROOT, str(score.musicfile))
+    midi_path = os.path.join(MEDIA_ROOT, str(score.midifile))
+    
+    if score.albam:
+        albam = score.albam
+        albam_art_path = os.path.join(MEDIA_ROOT, str(score.albam.art))
+    else:
+        albam = []
+        albam_art_path = []
+    os.remove(audio_path)
+    os.remove(midi_path)
+    """if not art_path == face_path and not art_path == albam_art_path:
+        os.remove(art_path)"""
+    score.delete()
+    if albam:
+        albam_scores = Score.objects.filter(albam=albam).order_by('albam_num')
+        i = 0
+        for aScore in albam_scores:
+            aScore.albam_num = i
+            aScore.save()
+            i += 1
+
+
+def deleteAlbam(albam):
+    art_path = os.path.join(MEDIA_ROOT, str(albam.art))
+    os.remove(art_path)
+    albam.delete()
+
+def score_delete(request, pk):
+    score = Score.objects.get(pk=pk)
+    my = CustomUser.objects.get(pk=request.user.id)
+    if score.artist.id == request.user.id: #リクエストに不正があるか
+        deleteScore(score)
+        return redirect('user_detail', pk=request.user.pk)
+    else:
+        return render(request, 'myapp/none.html',{})
+
+def albam_delete(request, pk):
+    albam = Albam.objects.get(pk=pk)
+    scores = Score.objects.filter(albam=albam)
+    if albam.artist.id == request.user.id: #リクエストに不正があるか
+        for score in scores:
+            deleteScore(score)
+        deleteAlbam(albam)
+        return redirect('user_detail', pk=request.user.pk)
+    else:
+        return render(request, 'myapp/none.html',{})
 
 def albam_edit(request, pk):
     this_albam = Albam.objects.get(pk=pk)
@@ -607,7 +677,6 @@ def albam_edit(request, pk):
                 albam = None
 
             scores = s_formset.save(commit=False)
-            print(scores)
             print(albam_scores)
             i = 0
             for score in albam_scores:
@@ -628,10 +697,8 @@ def albam_edit(request, pk):
                 i += 1
 
             score_objects = list()
-            print(s_formset.cleaned_data)
             for j in s_formset.cleaned_data:
                 score_objects.append(j["id"])
-            print(score_objects)
 
             albam_num_list = list()
 
@@ -648,7 +715,7 @@ def albam_edit(request, pk):
                 i += 1
 
             for anl in albam_num_list:
-                addTag_byScores(request, Score.objects.get(albam_num=anl[1]), 1, anl[0])
+                addTag_byScores(request, Score.objects.get(albam=albam, albam_num=anl[1]), 1, anl[0])
 
             return redirect('user_detail', pk=request.user.pk)
     else:

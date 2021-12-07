@@ -21,4 +21,9 @@ urlpatterns = [
     path('user_explanation/<int:pk>', views.user_explanation, name='user_explanation'),
     path('profit/<int:pk>', views.profit, name='profit'),
     path('stripe_created/', views.stripe_created, name='stripe_created'),
+    path('base_notice/', views.base_notice, name='base_notice'),
+    path('notice_detail/<int:pk>', views.notice_detail, name='notice_detail'),
+    path('notice/<int:pk>', views.notice, name='notice'),
+    path('score_delete/<int:pk>', views.score_delete, name='score_delete'),
+    path('albam_delete/<int:pk>', views.albam_delete, name='albam_delete'),
 ] 

@@ -8,8 +8,18 @@
         <link rel="stylesheet" href="{% static 'css/mysite.css' %}">
     </head>
     <style>
-        .faceMenueList, .faceMenueListLast, .noticeMenueList, .uploadMenueList{
+        .faceMenueList, .faceMenueListLast, .uploadMenueList{
             height: 40px;
+            width: 100%;
+            border-top: 1px groove whitesmoke;
+            border-left: 1px groove whitesmoke;
+            border-right: 1px groove whitesmoke;
+            display: flex;
+            /*justify-content: center;*/
+            align-items: center;
+        }
+        .noticeMenueList{
+            min-height: 40px;
             width: 100%;
             border-top: 1px groove whitesmoke;
             border-left: 1px groove whitesmoke;
@@ -33,7 +43,7 @@
             display: inline-block;
             margin-left: 15px;
         }
-        .faceMenueList:hover, .faceMenueListLast:hover, .noticeMenueList:hover, .uploadMenueList:hover{
+        .faceMenueList:hover, .faceMenueListLast:hover, .noticeMenueList:hover, .uploadMenueList:hover, #noticePlate:hover{
             background-color: rgba(0, 0, 0, 0.5);
         }
 
@@ -73,10 +83,8 @@
             </ul>
         </div>
         <div id="noticeMenue" style="width: 220px; top: 50px;right: 20px; position: fixed; background-color: rgb(30, 30, 30); display: none; ">
-            <ul style="list-style: none; padding-left: 0%; padding-top: 0%; border: 1px groove whitesmoke;">
-                <div style="margin: 0 auto; width: 70px;">お知らせ</div>
-                <!--<a href="{% url 'user_detail' pk=user.pk %}" ><li class="noticeMenueList"><div class="noticeMenueListText">hey</div></li></a>-->
-                <li class="noticeMenueList"><div class="noticeMenueListText">お知らせはありません</div></li>
+            <ul id="noticeMenueUl" style="list-style: none; padding-left: 0%; padding-top: 0%; border: 1px groove whitesmoke;">
+                <a href="{% url 'notice' pk=user.pk %}" ><div id="noticePlate" style="width: 100%;"><div style="margin: 0 auto; width: 70px;">お知らせ</div></div></a>
             </ul>
         </div>
         <div id="uploadMenue" style="width: 220px; top: 50px;right: 20px; position: fixed; background-color: rgb(30, 30, 30); display: none; ">
@@ -84,9 +92,71 @@
                 <a href="{% url 'create_score' %}" ><li class="uploadMenueList"><div class="uploadMenueListText">Midiデータをアップロード</div></li></a>
             </ul>
         </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         {% endif %}
 
         <script>
+            //AjaxのCSRFトークン start
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            var csrftoken = getCookie('csrftoken');
+
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });//end
+
+            $.ajax({
+                //サーバに送信するリクエストの設定
+                'url': '{% url "base_notice" %}',
+                'type': 'POST',
+                'data': {
+
+                },
+                'dataType': 'json'
+            })
+            .done(function(d){
+                //通信成功時の処理
+                console.log(d.titles[0][1]);
+                for(let i=0;i<d.titles.length;i++){
+                    var atag = document.createElement("a");
+                    atag.href = '{% url "notice_detail" 111 %}'.replace(/111/,d.titles[i][0]);
+                    document.getElementById("noticeMenueUl").appendChild(atag);
+                    var parent = document.createElement("div");
+                    parent.className = 'noticeMenueList';
+                    atag.appendChild(parent);
+                    var list = document.createElement("div");
+                    list.className = "noticeMenueListText";
+                    list.innerText = d.titles[i][1];
+                    parent.appendChild(list);
+                    console.log("成功");
+                }
+            })
+            .fail(function(){
+                //通信失敗時の処理
+                console.log("失敗");
+            })
+
             document.addEventListener('click', function(e){
                 if(!e.target.closest('#faceMenue')&&!e.target.closest('#face')){
                     document.getElementById("faceMenue").style.display = "none";
@@ -146,7 +216,6 @@
                         {% endif %}
                     </div>
                 </div>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
                 <script>
                     //AjaxのCSRFトークン start
                     function getCookie(name) {

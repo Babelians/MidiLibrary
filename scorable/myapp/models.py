@@ -21,7 +21,7 @@ class Score(models.Model):
     albam_num = models.IntegerField(blank=True, null = True)
     song_name = models.CharField(max_length=50)
     artist = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,)
-    score_art = models.ImageField(upload_to='score_art/', blank=True, )#default='score_art/defo.png')
+    score_art = models.ImageField(upload_to='score_art/', blank=True, null=True)#default='score_art/defo.png')
     musicfile = models.FileField(upload_to='musicfile/')
     midifile = models.FileField(upload_to='midifile/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -60,6 +60,13 @@ class Follow(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='follow_user') #related_nameがどうこうでエラーだ出た
     follow =  models.ForeignKey(get_user_model(), on_delete=models.CASCADE,)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class Notice(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    title = models.CharField(default="NULL",max_length=200)
+    content = models.CharField(null=True ,max_length=2000)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
 
 
 

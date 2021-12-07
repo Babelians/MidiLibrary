@@ -13,6 +13,9 @@
                 </div>
             </div>
             <button type="submit" style="margin-left: 200px;">更新</button>
+            <button class="btn" form="delete_form" type="submit" onclick='return confirm("本当に削除しますか？完全に削除されます。");' style="margin-left: 660px; background-color: brown;">削除</button>
+        </form>
+        <form method="post" id="delete_form" action="{% url 'score_delete' pk=score.pk %}">{% csrf_token %}
         </form>
     </div>
 </div>
@@ -25,11 +28,6 @@
     parent.appendChild(detail);
     
     //song name
-    /*var label_data = document.createElement('label');
-    label_data.htmlFor = 'id_form-'+'-song_name';
-    label_data.innerHTML = "Song name:";
-    var parent = document.getElementById('detail');
-    parent.appendChild(label_data);*/
 
     var input_data = document.createElement('input');
     input_data.type = 'text';
@@ -78,13 +76,6 @@
     var parent = document.getElementById("music_parent");
     parent.appendChild(input_data);
 
-    //art file
-    /*var label_data = document.createElement('label');
-    label_data.htmlFor = 'id_form-'+'-score_art';
-    label_data.innerHTML = "Score_art:";
-    var parent = document.getElementById('detail');
-    parent.appendChild(label_data);*/
-
     //art work parent
     let image_parent = document.createElement('div');
     image_parent.id = "art_work_parent";
@@ -99,7 +90,7 @@
     //song image rect
     let song_image = document.createElement('div');
     song_image.id = "song_image";
-    song_image.style = "width: 150px; height: 150px; border: 1px groove rgb(179, 179, 179); display: flex;";
+    song_image.style = "width: 269px; height: 150px; border: 1px groove rgb(179, 179, 179); display: flex; justify-content:center; over-flow:hidden;";
     var parent = document.getElementById("art_work_parent");
     parent.appendChild(song_image);
 
@@ -130,7 +121,6 @@
 
             // img要素をページに挿入
             var article_element = document.getElementById("song_image");
-            img_element.style.width = "100%";
             img_element.style.height = "100%";
             article_element.append(img_element);
         });
@@ -143,10 +133,11 @@
     var input_data = document.createElement('img');
     input_data.type = 'file';
     input_data.id = 's_image';
-    input_data.style = 'width:100%; height: 100%;';
+    input_data.style = 'height: 100%;';
     input_data.src = '{{ score.score_art.url }}';
     var parent = document.getElementById("song_image");
     parent.appendChild(input_data);
+    
 
     //タグ
     let tag_parent = document.createElement("div");
@@ -159,11 +150,6 @@
                 '{{ tags.8 }}','{{ tags.9 }}'];
     for(let i=0;i<10;i++){
         //tag name
-        /*var label_data = document.createElement('label');
-        label_data.htmlFor = 'id_form-'+'-tag_name_'+i;
-        label_data.innerHTML = "Tag_name_"+i+":";
-        var parent = document.getElementById('detail');
-        parent.appendChild(label_data);*/
 
         var input_data = document.createElement('input');
         input_data.type = 'text';

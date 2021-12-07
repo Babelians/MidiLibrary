@@ -357,7 +357,7 @@
             //song image rect
             let song_image = document.createElement('div');
             song_image.id = "song_image"+musicNum;
-            song_image.style = "width: 150px; height: 150px; border: 1px groove rgb(179, 179, 179); display: flex;";
+            song_image.style = "width: 269px; height: 150px; border: 1px groove rgb(179, 179, 179); display: flex; justify-content:center; over-flow:hidden;";
             var parent = document.getElementById("art_work_parent"+musicNum);
             parent.appendChild(song_image);
 
@@ -388,7 +388,6 @@
 
                     // img要素をページに挿入
                     var article_element = document.getElementById("song_image"+detailNum);
-                    img_element.style.width = "100%";
                     img_element.style.height = "100%";
                     article_element.append(img_element);
                 });

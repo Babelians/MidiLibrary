@@ -5,7 +5,6 @@
         #score_art{
             z-index: 1;
             position: absolute;
-            opacity: 0.5;
         }
         canvas{
             z-index: 2;
@@ -61,9 +60,10 @@
             <audio id=audio>
                 <source src="{{ score.musicfile.url }}">
             </audio>
-            <div id="score">
-                <img id="score_art" src="{{ score.score_art.url }}" style="width: 1150; height: 650px;"/>
-                <canvas id="myCanvas" width="1150" height="650"></canvas>
+            <div id="score" style=" width: 1150; height: 650px; display: flex; justify-content: center; overflow: hidden;">
+                <img src="{{ score.score_art.url }}" style="height: 65000px; filter: brightness(50%);"/>
+                <img id="score_art" src="{{ score.score_art.url }}" style="height: 650px; filter: brightness(50%);"/>
+                <canvas id="myCanvas" width="1150" height="650" style="position: absolute;"></canvas>
             </div>
 
             <div style="margin-top: 15px;">
@@ -84,10 +84,7 @@
                             <img id="menueon" src="{% static 'img/menueon.png' %}"></img>
                             <img id="midimenue" src="{% static 'img/midimenue.png' %}"></img>
                         </div>
-                        <!--<a href="{% url 'score_detail' pk=score.pk %}"><img src="{{ score.score_art.url }}" style="height: 80%; margin-left: 5px;"/></a>
-                        <div style="width: 15%; overflow: hidden; font-size: 20px;">
-                            <p>{{ score.song_name }}</p>
-                        </div>-->
+                        
                         <img src="{% static 'img/midimenue.png' %}" onclick="clickMenue()" style="height: 70%;" alt="loop" id="menuebtn">
                         <img src="{% static 'img/loop.png' %}" onclick="clickLoop()" style="height: 70%;" alt="loop" id="loopbtn">
                         <div>
@@ -1319,12 +1316,17 @@
 
             {% for post in recommend_byAlbam %}
             <div class="post" style="display: flex; margin-top: 10px;">
-                <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 140px; height: 90px;"/></a>
+                <a href="{% url 'score_detail' pk=post.pk %}">
+                    <div style="overflow: hidden; position: relative; width: 140px; height: 90px; display: flex; justify-content: center; align-items: center;">
+                        <img src="{{ post.score_art.url }}" style="height: 8000px; display: block;"/>
+                        <img src="{{ post.score_art.url }}" style="position: absolute; height: 90px; display: block;"/>
+                    </div>
+                </a>
                 <div style="margin-left: 5px; word-break: break-all; overflow:hidden;">
                     <div style="max-height: 50px; font-size: 15px; flex-wrap: wrap; overflow: hidden;">
                         <a href="{% url 'score_detail' pk=post.pk %}" style="color: white;">{{ post.song_name }}</a>
                     </div>
-                    <div style="height: 20px; font-size: 13px; overflow: hidden;">
+                    <div style="height: 20px; font-size: 13px; overflow:hidden;">
                         <a href="{% url 'user_detail' pk=post.artist.pk %}">{{ post.artist.username }}</a>
                     </div>
                     <div style="height: 20px; font-size: 13px; color: darkgray; overflow: hidden;">
@@ -1338,7 +1340,12 @@
             {% if post == score %}
             {% else %}
             <div class="post" style="display: flex; margin-top: 10px;">
-                <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 140px; height: 90px;"/></a>
+                <a href="{% url 'score_detail' pk=post.pk %}">
+                    <div style="overflow: hidden; position: relative; width: 140px; height: 90px; display: flex; justify-content: center; align-items: center;">
+                        <img src="{{ post.score_art.url }}" style="height: 8000px; display: block;"/>
+                        <img src="{{ post.score_art.url }}" style="position: absolute; height: 90px; display: block;"/>
+                    </div>
+                </a>
                 <div style="margin-left: 5px; word-break: break-all; overflow:hidden;">
                     <div style="max-height: 50px; font-size: 15px; flex-wrap: wrap; overflow: hidden;">
                         <a href="{% url 'score_detail' pk=post.pk %}" style="color: white;">{{ post.song_name }}</a>
@@ -1356,18 +1363,7 @@
 
             <!--{% for post in recommend_scores %}
             <div class="post" style="display: flex; margin-top: 10px;">
-                <a href="{% url 'score_detail' pk=post.pk %}"><img src="{{ post.score_art.url }}" style="width: 140px; height: 90px;"/></a>
-                <div style="margin-left: 5px; word-break: break-all; overflow:hidden;">
-                    <div style="max-height: 50px; font-size: 15px; flex-wrap: wrap; overflow: hidden;">
-                        <a href="{% url 'score_detail' pk=post.pk %}" style="color: white;">{{ post.song_name }}</a>
-                    </div>
-                    <div style="height: 20px; font-size: 13px; overflow:hidden;">
-                        <a href="{% url 'user_detail' pk=post.artist.pk %}">{{ post.artist.username }}</a>
-                    </div>
-                    <div style="height: 20px; font-size: 13px; color: darkgray; overflow: hidden;">
-                        {{ post.play_count }}回再生
-                    </div>
-                </div>
+                
             </div>
             {% endfor %}-->
             <br>

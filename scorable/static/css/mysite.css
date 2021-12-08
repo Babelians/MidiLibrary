@@ -2,12 +2,18 @@ img{
     user-select: none; /*写真クリック反応無効*/
 }
 
+input, textarea{
+    font-family: inherit;
+    font-size: 14px;
+}
+
 a,
 a:visited,
 a:hover,
 a:active {
   color:#aaa;
   text-decoration: none;
+  word-wrap:break-word;
 }
 
 body {

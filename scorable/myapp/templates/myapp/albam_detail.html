@@ -5,7 +5,7 @@
     <div class="inner-content" style="margin: 0 auto; width: 1150px;">
         <div style="margin-top: 50px;"></div>
 
-        <div style="width: 100%; border: 1px groove #c9c9c9;">
+        <div style="width: 950px; border: 1px groove #c9c9c9;">
 
             <div class="post" style="width: 100%; display: flex; border-bottom: 1px groove rgb(206, 206, 206);">
                 <div style="margin: 10px 10px;">
@@ -27,7 +27,7 @@
             {% for score in scores %}
             <div style="width: 100%; border-bottom: 1px groove #c9c9c9; font-size: 19px; display: flex;">
                 <div style="width: 25px; text-align: center; margin-left: 5px;">{{forloop.counter}}</div>
-                <div style="width: 200px;"><a href="{% url 'score_detail' pk=score.pk %}" style="margin-left: 10px;">{{ score.song_name }}</a></div>
+                <div style="width: 800px;"><a href="{% url 'score_detail' pk=score.pk %}" style="margin-left: 10px;">{{ score.song_name }}</a></div>
                 {% if user == my %}
                 <div style="margin: 0 0 0 auto; width: 50px;"><a href="{% url 'score_edit' pk=score.pk %}">編集</a></div>
                 {% endif %}

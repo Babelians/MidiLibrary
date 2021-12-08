@@ -1002,38 +1002,37 @@
     
             </script>
             <div class="comment">
-                <span style="display: flex; height: 50px;">
-                    <span style="font-size: 15px;">{{ score.play_count }}Play</span>
+                <div style="display: flex; height: 50px;">
+                    <span style="font-size: 15px;"><i class="fas fa-play" style="color: gray;"></i>{{ score.play_count }}</span>
                     {% if user.id %}
-                    <form method="POST" id="score_heart">
-                    {% csrf_token %}
-                    <button type="submit" id="Like" name="Like">Like</button>
-                    </form>
+                    <i class="far fa-heart" id="Like" style="width: 20px; height: 20px; font-size: 20px; color: white; cursor: pointer; margin-left: 10px;"></i>
                     {% else %}
-                    <span>Like</span>
+                    <span style="margin-left: 10px;">Like</span>
                     {% endif %}
                     <div id="scoreHeartCount">{{ score.heart_count }}</div>
-                    {% if not score.price or purchased %}
-                    <a href="{{ score.midifile.url }}">Download</a>
-                    {% endif %}
-                    <!-- 購入ボタン・フォームの作成 -->
-                    {% if user.is_authenticated and score.price and not purchased %}
-                    <form action="" method="POST">
-                        <script
-                            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                            data-key="{{ public_key }}"
-                            data-amount="{{ score.price }}"
-                            data-name="Midi Libraly"
-                            data-description="{{ score.song_name }}"
-                            data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-                            data-locale="ja"
-                            data-currency="{{ currency }}"
-                            data-email="{{ user.email }}">
-                        </script>
-                        {% csrf_token %}
-                    </form>
-                    {% endif %}
-                </span>
+                    <div style="margin: 0 0 0 auto;">
+                        {% if not score.price or purchased %}
+                        <a href="{{ score.midifile.url }}">Download</a>
+                        {% endif %}
+                        <!-- 購入ボタン・フォームの作成 -->
+                        {% if user.is_authenticated and score.price and not purchased %}
+                        <form action="" method="POST">
+                            <script
+                                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                data-key="{{ public_key }}"
+                                data-amount="{{ score.price }}"
+                                data-name="Midi Libraly"
+                                data-description="{{ score.song_name }}"
+                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                data-locale="ja"
+                                data-currency="{{ currency }}"
+                                data-email="{{ user.email }}">
+                            </script>
+                            {% csrf_token %}
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
                 <div style="display: block; margin-top: 10px; border-top: 1px groove rgb(150, 150, 150); width: 1150px;
                 border-bottom: 1px groove rgb(150, 150, 150); width: 1150px;">
                     <!--<span style="font-size: 20px; margin: 0 auto;">{{ score.song_name }}</span>-->
@@ -1099,10 +1098,7 @@
                             <div style="font-size: 16px;">{{ post.content|linebreaksbr }}</div>
                             <span style="display: flex;">
                                 {% if user.id %}
-                                <form method="POST" id="comment_heart">
-                                {% csrf_token %}
-                                <button type="submit" class="LikeC" id="{{ post.id }}" name="LikeC" value="{{ post.my_heart }}">Like</button>
-                                </form>
+                                <i class="far fa-heart" id="{{ post.id }}" name="LikeC" data-value="{{ post.my_heart }}" style="width: 18px; height: 18px; font-size: 18px; color: white; cursor: pointer;"></i>
                                 <div id="LikeCSum{{ post.id }}" style="margin-left: 8px;">{{ post.heart_count }}</div>
                                 {% endif %}
                             </span>
@@ -1158,6 +1154,8 @@
                 let scoreHeartMyCount = false; //いいねを押したか
                 if('{{ songHeartMyCount }}'>0){
                     scoreHeartMyCount = true;
+                    document.getElementById("Like").className = "fas fa-heart";
+                    document.getElementById("Like").style.color = "rgb(200,0,0)";
                 }
 
                 document.getElementById("Like").addEventListener('click', function(e){
@@ -1170,11 +1168,15 @@
                         let newText = document.createTextNode(parseInt(scoreHeartCount.innerText)+1);
                         scoreHeartCount.firstChild.remove();
                         scoreHeartCount.appendChild(newText);
+                        document.getElementById("Like").className = "fas fa-heart";
+                        document.getElementById("Like").style.color = "rgb(200,0,0)";
                     }else{
                         let scoreHeartCount = document.getElementById("scoreHeartCount");
                         let newText = document.createTextNode(parseInt(scoreHeartCount.innerText)-1);
                         scoreHeartCount.firstChild.remove();
                         scoreHeartCount.appendChild(newText);
+                        document.getElementById("Like").className = "far fa-heart";
+                        document.getElementById("Like").style.color = "white";
                     }
 
                     $.ajax({
@@ -1244,22 +1246,31 @@
                     })
                 });
 
-                let likecs = document.getElementsByClassName("LikeC");
+                let likecs = document.getElementsByName("LikeC");
                 for(let i=0;i<likecs.length;i++){
+                    console.log(likecs[i].dataset);
+                    if( likecs[i].dataset.value>0){
+                        likecs[i].className = className = "fas fa-heart";
+                        likecs[i].style.color = "rgb(200,0,0)";
+                    }
                     likecs[i].addEventListener('click', function(e){
                         e.preventDefault();
-                        if(e.target.value>0){
+                        if(e.target.dataset.value>0){
                             let scoreHeartCount = document.getElementById("LikeCSum"+e.target.id);
                             let newText = document.createTextNode(parseInt(scoreHeartCount.innerText)-1);
                             scoreHeartCount.firstChild.remove();
                             scoreHeartCount.appendChild(newText);
-                            e.target.value = 0;
+                            e.target.dataset.value = 0;
+                            e.target.className = "far fa-heart";
+                            likecs[i].style.color = "white";
                         }else{
                             let scoreHeartCount = document.getElementById("LikeCSum"+e.target.id);
                             let newText = document.createTextNode(parseInt(scoreHeartCount.innerText)+1);
                             scoreHeartCount.firstChild.remove();
                             scoreHeartCount.appendChild(newText);
-                            e.target.value = 1;
+                            e.target.dataset.value = 1;
+                            e.target.className = "fas fa-heart";
+                            likecs[i].style.color = "rgb(200,0,0)";
                         }
 
                         $.ajax({

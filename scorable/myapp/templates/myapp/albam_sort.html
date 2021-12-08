@@ -25,7 +25,7 @@
             {% for score in scores %}
             <div style="width: 700px; border-bottom: 1px groove #c9c9c9; font-size: 19px; display: flex;">
                 <div style="width: 25px; text-align: center;">{{forloop.counter}}</div>
-                <div style="width: 200px;"><a href="{% url 'score_detail' pk=score.pk %}" style="margin-left: 10px;">{{ score.song_name }}</a></div>
+                <div style="width: 600px;"><a href="{% url 'score_detail' pk=score.pk %}" style="margin-left: 10px;">{{ score.song_name }}</a></div>
                 {% if user == my %}
                 <div style="margin: 0 0 0 auto; width: 50px;"><a href="{% url 'score_edit' pk=score.pk %}">編集</a></div>
                 {% endif %}

@@ -4,7 +4,7 @@
 {% load static %}
     <div class="content">
         <form method="POST" enctype="multipart/form-data">
-            <div style="width: 900px; margin: 0 auto;">
+            <div style="width: 1000px; margin: 0 auto;">
                 {% csrf_token %}
                 <!--{{ s_formset }}-->
                 <div id="albam_parent">
@@ -13,7 +13,7 @@
                         <div id="albam_image" style="width: 60px; height: 60px; border: 1px groove rgb(179, 179, 179); margin-left: 1%;"></div>
                     </div> -->
                 </div>
-                <div style="display: flex; height: 650px; width: 900px; border: 1px groove #c9c9c9;">
+                <div style="display: flex; height: 690px; width: 1000px; border: 1px groove #c9c9c9;">
                     <ul id="add" style="width: 35%; list-style: none; padding-left: 0%; margin-top: 0%;">
                         <!--<input type="file" id='id_form-0-midifile' accept=".mid" > -->
                     </ul>
@@ -30,7 +30,7 @@
                     {% endfor %}-->
                 {{ s_formset.management_form }}
                 <button type="submit">更新</button>
-                <button class="btn" form="delete_form" type="submit" onclick='return confirm("本当に削除しますか？アルバムに関連付けられた楽曲も完全に削除されます。");' style="margin-left: 809px; background-color: brown;">削除</button>
+                <button class="btn" form="delete_form" type="submit" onclick='return confirm("本当に削除しますか？アルバムに関連付けられた楽曲も完全に削除されます。");' style="margin-left: 909px; background-color: brown;">削除</button>
             </div>
         </form>
         <form method="post" id="delete_form" action="{% url 'albam_delete' pk=albam.pk %}">{% csrf_token %}
@@ -65,7 +65,7 @@
             //albam parent
             let albam_detail = document.createElement('div');
             albam_detail.id = "albam_detail";
-            albam_detail.style = "height: 90px; display: flex; width: 900px; border: 1px groove #c9c9c9; border-style: groove groove none groove; align-items: center;";
+            albam_detail.style = "height: 90px; display: flex; width: 1000px; border: 1px groove #c9c9c9; border-style: groove groove none groove; align-items: center;";
             var parent = document.getElementById('albam_parent');
             parent.appendChild(albam_detail);
 

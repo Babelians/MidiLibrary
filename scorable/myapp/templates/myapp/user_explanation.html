@@ -12,8 +12,10 @@
     <div class="user_detail_border">
         <div style="width: 95%; margin: 0 auto; margin-top: 10px;">
             <div style="font-size: 19px;">説明</div>
-            <div style="margin-top: 10px;">{{ my.explanation|linebreaksbr }}</div>
-           <div style="font-size: 15px; margin-top: 20px;">登録日 : {{ my.date_joined }}</div>
+            <div style="margin-top: 10px; word-wrap:break-word;">{{ my.explanation|linebreaksbr }}</div>
+            <div style="font-size: 15px; margin-top: 20px;">国籍 : {{ my.country }}</div>
+           <div style="font-size: 15px;">登録日 : {{ my.date_joined }}</div>
+           <br>
         </div>
     </div>
 

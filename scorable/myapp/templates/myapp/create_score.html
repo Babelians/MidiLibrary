@@ -4,7 +4,7 @@
 {% load static %}
     <div class="content">
         <form method="POST" enctype="multipart/form-data">
-            <div style="width: 900px; margin: 0 auto;">
+            <div style="width: 1000px; margin: 0 auto;">
                 {% csrf_token %}
                 <div id="albam_parent">
                     <button id="add_albam" type="button" class="music_add_btn" onclick="addAlbam()">Add albam</button>
@@ -12,7 +12,7 @@
                         <div id="albam_image" style="width: 60px; height: 60px; border: 1px groove rgb(179, 179, 179); margin-left: 1%;"></div>
                     </div> -->
                 </div>
-                <div style="display: flex; height: 650px; width: 900px; border: 1px groove #c9c9c9;">
+                <div style="display: flex; height: 690px; width: 1000px; border: 1px groove #c9c9c9;">
                     <ul id="add" style="width: 35%; list-style: none; padding-left: 0%; margin-top: 0%;">
                         <!--<input type="file" id='id_form-0-midifile' accept=".mid" > -->
                     </ul>
@@ -36,7 +36,7 @@
             //albam parent
             let albam_detail = document.createElement('div');
             albam_detail.id = "albam_detail";
-            albam_detail.style = "height: 90px; display: flex; width: 900px; border: 1px groove #c9c9c9; border-style: groove groove none groove; align-items: center;";
+            albam_detail.style = "height: 90px; display: flex; width: 1000px; border: 1px groove #c9c9c9; border-style: groove groove none groove; align-items: center;";
             var parent = document.getElementById('albam_parent');
             parent.appendChild(albam_detail);
 
@@ -120,7 +120,7 @@
             let gomi = document.createElement("img");
             gomi.src = "{% static 'img/gomi.png' %}";
             gomi.id = "gomi";
-            gomi.style = "height: 100%; width:100%;";
+            gomi.style = "height: 100%; width:80%;";
             gomi.draggable = false;
             var parent = document.getElementById('gomiBox');
             parent.appendChild(gomi);

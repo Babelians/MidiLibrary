@@ -5,9 +5,23 @@
 <html lang="ja">
     <head>
         <title>MidiLibrary</title>
+        <meta name="description" content="MidiLibrary(ミディライブラリー)は、Midiデータ作品の購入・販売が行えるサービスです。幅広いジャンルの音楽作品作品がユーザーによって投稿されています。">
+        <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" 
+        rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" 
+        crossorigin="anonymous">-->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel ="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
         <link rel="stylesheet" href="{% static 'css/mysite.css' %}">
     </head>
     <style>
+        #faceMenue, #noticeMenue, #uploadMenue{
+            width: 220px; 
+            top: 50px;
+            right: 20px;
+            position: fixed; 
+            display: none;
+            z-index: 999;
+        }
         .faceMenueList, .faceMenueListLast, .uploadMenueList{
             height: 40px;
             width: 100%;
@@ -17,6 +31,7 @@
             display: flex;
             /*justify-content: center;*/
             align-items: center;
+            background-color: rgb(30, 30, 30); 
         }
         .noticeMenueList{
             min-height: 40px;
@@ -27,9 +42,11 @@
             display: flex;
             /*justify-content: center;*/
             align-items: center;
+            background-color: rgb(30, 30, 30); 
         }
         .faceMenueListLast{
             border-bottom: 1px groove whitesmoke;
+            background-color: rgb(30, 30, 30); 
         }
         .uploadMenueList{
             height: 40px;
@@ -38,23 +55,24 @@
             display: flex;
             /*justify-content: center;*/
             align-items: center;
+            background-color: rgb(30, 30, 30); 
         }
         .faceMenueListText, .noticeMenueListText, .uploadMenueListText{
             display: inline-block;
             margin-left: 15px;
         }
         .faceMenueList:hover, .faceMenueListLast:hover, .noticeMenueList:hover, .uploadMenueList:hover, #noticePlate:hover{
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(10, 10, 10, 1);
         }
 
     </style>
     <body>
         <header class="header">
             <div class="container">
-                <div><a href="{% url 'index' %}">MidiLibrary</a></div>
+                <div><a href="{% url 'index' %}">MidiLibrary-βテスト</a></div>
                 <form method="GET" action="{% url 'search' %}" style="margin: auto 0 auto 0; margin: 0 auto;">
                     <input type="text" name="keyword" placeholder=" 検索" value="{{keyword}}" required style="width: 450px; height: 35px;">
-                    <button type="submit" style="width: 65px; height: 35px">Search</button>
+                    <!--<button type="submit" style="width: 65px; height: 35px">Search</button>-->
                 </form>
                 {% if user.id %}
                 <div style="display: flex; width: 140px;">
@@ -72,7 +90,7 @@
             </div>
         </header>
         {% if user.id %}
-        <div id="faceMenue" style="width: 220px; top: 50px;right: 20px; position: fixed; background-color: rgb(30, 30, 30); display: none; ">
+        <div id="faceMenue">
             <ul style="list-style: none; padding-left: 0%; padding-top: 0%;">
                 <a href="{% url 'user_detail' pk=user.pk %}" ><li class="faceMenueList"><div class="faceMenueListText">ホーム</div></li></a>
                 <a href="{% url 'user_likes' pk=user.pk %}"><li class="faceMenueList"><div class="faceMenueListText">ブックマーク</div></li></a>
@@ -82,12 +100,12 @@
                 <a href="{% url 'logout' %}"><li class="faceMenueListLast"><div class="faceMenueListText">ログアウト</div></li></a>
             </ul>
         </div>
-        <div id="noticeMenue" style="width: 220px; top: 50px;right: 20px; position: fixed; background-color: rgb(30, 30, 30); display: none; ">
+        <div id="noticeMenue">
             <ul id="noticeMenueUl" style="list-style: none; padding-left: 0%; padding-top: 0%; border: 1px groove whitesmoke;">
                 <a href="{% url 'notice' pk=user.pk %}" ><div id="noticePlate" style="width: 100%;"><div style="margin: 0 auto; width: 70px;">お知らせ</div></div></a>
             </ul>
         </div>
-        <div id="uploadMenue" style="width: 220px; top: 50px;right: 20px; position: fixed; background-color: rgb(30, 30, 30); display: none; ">
+        <div id="uploadMenue">
             <ul style="list-style: none; padding-left: 0%; padding-top: 0%;">
                 <a href="{% url 'create_score' %}" ><li class="uploadMenueList"><div class="uploadMenueListText">Midiデータをアップロード</div></li></a>
             </ul>
@@ -156,6 +174,9 @@
                 //通信失敗時の処理
                 console.log("失敗");
             })
+            document.getElementById("faceMenue").style.display = "none";
+            document.getElementById("noticeMenue").style.display = "none";
+            document.getElementById("uploadMenue").style.display = "none";
 
             document.addEventListener('click', function(e){
                 if(!e.target.closest('#faceMenue')&&!e.target.closest('#face')){
@@ -207,7 +228,7 @@
             
                         <!--編集-->
                         {% if my == user %}
-                        <a href="{% url 'user_edit' pk=user.pk %}" style="margin-left: 30px;">edit</a>
+                        <a href="{% url 'user_edit' pk=user.pk %}" style="margin-left: 30px;">編集</a>
                         {% elif user.id %}
                         <button type="submit" id="Follow" name="Follow" style="margin: 0 0 0 auto; width: 120px; height: 40px;">
                             <div id="following" style="display: none;">Following</div>

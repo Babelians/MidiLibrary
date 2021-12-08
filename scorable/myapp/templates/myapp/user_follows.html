@@ -14,9 +14,9 @@
     <div class="post" style="width: 950px; height: 70px; display: flex;align-items: center; border-bottom: 1px groove rgb(206, 206, 206);">
         <a href="{% url 'user_detail' pk=f.follow.pk %}" style="display: flex; align-items: center;">
             <img src="{{ f.follow.face.url }}" style="width: 45px; height: 45px; border-radius: 50%;vertical-align: middle; margin: 0 0 0 10px;"/>
-            <span style="font-size: 18px; margin: 0 0 0 10px; width: 200px; max-height: 70px;">{{ f.follow.username }}</span>
+            <div style="font-size: 18px; margin: 0 0 0 20px; width: 200px; max-height: 50px; overflow: hidden;">{{ f.follow.username }}</div>
         </a>
-        <div style="margin: 0 0 0 40px; width: 500px; max-height: 70px; overflow: hidden;" >{{ f.follow.explanation }}</div>
+        <div style="margin: 0 0 0 40px; width: 500px; max-height: 50px; overflow: hidden; word-wrap:break-word;" >{{ f.follow.explanation }}</div>
         <form method="POST" id="comment_heart" style="margin: 0 25px 0 auto;">
             {% csrf_token %}
             <button type="submit" class="Follow" id="{{ f.follow.id }}" name="Follow" value="1" style="height: 35px; width: 80px; background-color: rgb(150, 150, 150);">

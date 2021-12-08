@@ -18,11 +18,13 @@
                     <img src="{{ post.score_art.url }}" style="height: 6000px;"/>
                 </div>
             </a>
-            <div style="margin-left: 10px; width: 30%; overflow: hidden;"><a href="{% url 'score_detail' pk=post.pk %}">{{ post.song_name }}</a></div>
+            <div style="margin-left: 15px; width: 240px; overflow: hidden;"><a href="{% url 'score_detail' pk=post.pk %}">{{ post.song_name }}</a></div>
             {% if post.albam %}
-            <div style="margin-left: 5%; width: 30%; overflow: hidden;">Albam : <a href="{% url 'albam_detail' pk=post.albam.pk %}">{{ post.albam.albam_title }}</a></div>
+            <div style="margin-left: 50px; width: 240px; overflow: hidden;"><a href="{% url 'albam_detail' pk=post.albam.pk %}">{{ post.albam.albam_title }}</a></div>
+            {% else %}
+            <div style="margin-left: 50px; width: 240px; overflow: hidden;">シングル</div>
             {% endif %}
-            
+            <div style="margin-left: 20px; max-width: 240px; overflow: hidden; margin: 0 0 0 auto;">{{ post.play_count }}回再生</div>
             {% if my == user %}
             <div style="margin: 0 0 0 auto; width: 50px;"><a href="{% url 'score_edit' pk=post.pk %}">編集</a></div>
             {% endif %}

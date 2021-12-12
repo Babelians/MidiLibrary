@@ -16,7 +16,7 @@
             <img src="{{ f.follow.face.url }}" style="width: 45px; height: 45px; border-radius: 50%;vertical-align: middle; margin: 0 0 0 10px;"/>
             <div style="font-size: 18px; margin: 0 0 0 20px; width: 200px; max-height: 50px; overflow: hidden;">{{ f.follow.username }}</div>
         </a>
-        <div style="margin: 0 0 0 40px; width: 500px; max-height: 50px; overflow: hidden; word-wrap:break-word;" >{{ f.follow.explanation }}</div>
+        <div style="margin: 0 0 0 40px; width: 500px; max-height: 50px; overflow: hidden; word-wrap:break-word;" >{{ f.follow.explanation|urlize }}</div>
         <form method="POST" id="comment_heart" style="margin: 0 25px 0 auto;">
             {% csrf_token %}
             <button type="submit" class="Follow" id="{{ f.follow.id }}" name="Follow" value="1" style="height: 35px; width: 80px; background-color: rgb(150, 150, 150);">

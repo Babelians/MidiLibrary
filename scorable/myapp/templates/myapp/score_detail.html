@@ -20,6 +20,7 @@
             width: 1150;
             height: 10px;
             background-color: rgb(216, 216, 216);
+            margin-top: 8px;
             /*bottom: 5%;*/
         }
         #seekbar{
@@ -1046,18 +1047,29 @@
                             <div style="display: flex; font-size: 12px;">フォロワー<div id="followCount">{{ score.artist.subscriber }}</div></div>
                         </div>
                         {% if user.id %}
+                        {% if user.id != score.artist.id  %}
                         <button type="submit" id="Follow" name="Follow" style="margin: 0 0 0 auto; width: 120px; height: 40px;">
                             <div id="following" style="display: none;">Following</div>
                             <div id="notfollow" style="display: none;">Follow</div>
                         </button>
                         {% endif %}
+                        {% endif %}
                     </div>
 
                     <div style="margin-top: 8px; margin-left: 40px;">
                         {% if score.explanation %}
-                            {{ score.explanation|linebreaksbr }}
+                            <div style="margin-top: 20px;">{{ score.explanation|linebreaksbr|urlize }}</div>
                         {% endif %}
-                        <div>
+                        {% if score.albam %}
+                        <div style="display: flex; margin-top: 20px;">
+                            <a href="{% url 'albam_detail' pk=score.albam.pk %}"><img src="{{ score.albam.art.url }}" style="width: 80px; height: 80px;"></a>
+                            <div>
+                                <div style="margin-left: 10px;">{{ score.albam.albam_title }}</div>
+                                <div style="margin-left: 10px; font-size: 14px;">{{ score.albam.uploaded_at }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div style="margin-top: 20px;">
                             {% for tag in tags %}
                             {% if tag %}
                                 <a href="{% url 'search' %}?keyword={{tag}}" style="color: blueviolet;">#{{ tag }}</a>
@@ -1095,7 +1107,7 @@
                         <div class="name_and_comment">
                             <span style="font-size: 14px;">{{ post.owner.username }}</span>
                             <span style="color: rgb(122, 122, 122); font-size: 14px">{{ post.uploaded_at }}</span>
-                            <div style="font-size: 16px;">{{ post.content|linebreaksbr }}</div>
+                            <div style="font-size: 16px;">{{ post.content|linebreaksbr|urlize }}</div>
                             <span style="display: flex;">
                                 {% if user.id %}
                                 <i class="far fa-heart" id="{{ post.id }}" name="LikeC" data-value="{{ post.my_heart }}" style="width: 18px; height: 18px; font-size: 18px; color: white; cursor: pointer;"></i>

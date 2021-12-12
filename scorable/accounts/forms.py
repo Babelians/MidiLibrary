@@ -182,7 +182,7 @@ def activate_user(uidb64, token):
             email = user.email,
             business_type = "individual",
             business_profile = {
-                "url": "https://www.fixes.pub/program/756486.html", #本番ではuser_detailのurlを使う
+                "url": "http://midilibrary.net", #本番ではuser_detailのurlを使う
                 "mcc":"5815", #Digital Goods Media – Books, Movies, Music
                 "product_description":"Midiデータ販売",
                 "support_email": user.email,

@@ -2,7 +2,7 @@ img{
     user-select: none; /*写真クリック反応無効*/
 }
 
-input, textarea{
+input, textarea, select{
     font-family: inherit;
     font-size: 14px;
 }

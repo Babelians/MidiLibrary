@@ -143,7 +143,7 @@ def profit(request, pk):
             accountLink = stripe.AccountLink.create(
                 account = account.id,
                 refresh_url = FRONTEND_URL,
-                return_url = FRONTEND_URL+"/profit/"+str(my.id),
+                return_url = FRONTEND_URL+"/stripe_created/"+str(my.id),
                 type = "account_onboarding",
             )
             return redirect(accountLink.url)
@@ -152,8 +152,11 @@ def profit(request, pk):
     else:
         return render(request, 'myapp/none.html',{})
 
-def stripe_created(request):
-    return render(request, 'myapp/index.html', {'request':request})
+def stripe_created(request, pk):
+    user = get_object_or_404(CustomUser, pk=pk)
+    Notice.objects.create(user=user, title="口座登録完了",
+            content="口座登録が完了しました。Midiデータを販売して収益を受け取ることができます。" )
+    return redirect('')
 
 def user_edit(request, pk):
     my = CustomUser.objects.get(pk=pk)

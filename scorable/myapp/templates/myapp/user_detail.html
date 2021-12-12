@@ -24,7 +24,7 @@
             {% else %}
             <div style="margin-left: 50px; width: 240px; overflow: hidden;">シングル</div>
             {% endif %}
-            <div style="margin-left: 20px; max-width: 240px; overflow: hidden; margin: 0 0 0 auto;">{{ post.play_count }}回再生</div>
+            <div style="margin-left: 20px; max-width: 240px; overflow: hidden; margin: 0 15px 0 auto;">{{ post.play_count }}回再生</div>
             {% if my == user %}
             <div style="margin: 0 0 0 auto; width: 50px;"><a href="{% url 'score_edit' pk=post.pk %}">編集</a></div>
             {% endif %}

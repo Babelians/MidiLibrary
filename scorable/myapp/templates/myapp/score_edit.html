@@ -47,8 +47,8 @@
     input_data.name = 'explanation';
     input_data.id = 'id_explanation';
     input_data.placeholder = '説明';
-    if('{{score.explanation}}' != 'None'){
-        input_data.value = '{{score.explanation}}';
+    if('{{score.explanation|escapejs}}' != 'None'){
+        input_data.value = '{{score.explanation|escapejs}}';
     }
     input_data.style = "display: block; width: 95%; height: 20%;";
     var parent = document.getElementById('detail');
@@ -60,7 +60,7 @@
     music_parent.style = "margin-top: 3%;";
     parent.appendChild(music_parent);
 
-    let music_label = document.createTextNode("MP3: current:");
+    let music_label = document.createTextNode("MP3 : ");
     music_label.textContent += "{{ score.musicfile }}".slice(10);
     var parent = document.getElementById("music_parent");
     parent.appendChild(music_label);

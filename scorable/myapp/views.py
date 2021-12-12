@@ -22,7 +22,7 @@ range_100 = [i for i in range(100)]
 
 def base_notice(request):
     if request.user.id:
-        notices = Notice.objects.filter(user=request.user).order_by('uploaded_at')
+        notices = Notice.objects.filter(user=request.user).order_by('-uploaded_at')
         titles = list()
         i = 0
         for notice in notices:
@@ -143,20 +143,24 @@ def profit(request, pk):
             accountLink = stripe.AccountLink.create(
                 account = account.id,
                 refresh_url = FRONTEND_URL,
-                return_url = FRONTEND_URL+"/stripe_created/"+str(my.id),
+                return_url = FRONTEND_URL+"stripe_created/"+str(my.id),
                 type = "account_onboarding",
             )
             return redirect(accountLink.url)
         else:
-            return render(request, 'myapp/profit.html', {'my': my, 'stripeLink':stripe.Account.create_login_link(my.stripe_id).url, "posts":posts,})
+            #return render(request, 'myapp/profit.html', {'my': my, 'stripeLink':stripe.Account.create_login_link(my.stripe_id).url, "posts":posts,})
+            return redirect(stripe.Account.create_login_link(my.stripe_id).url)
     else:
         return render(request, 'myapp/none.html',{})
 
 def stripe_created(request, pk):
-    user = get_object_or_404(CustomUser, pk=pk)
-    Notice.objects.create(user=user, title="口座登録完了",
-            content="口座登録が完了しました。Midiデータを販売して収益を受け取ることができます。" )
-    return redirect('')
+    user = CustomUser.objects.get(pk=pk)
+    if request.user.id == user.id:
+        Notice.objects.create(user=user, title="口座登録完了",
+                content="口座登録が完了しました。Midiデータを販売して収益を受け取ることができます。" )
+        return redirect('index')
+    else:
+        return render(request, 'myapp/none.html', {})
 
 def user_edit(request, pk):
     my = CustomUser.objects.get(pk=pk)

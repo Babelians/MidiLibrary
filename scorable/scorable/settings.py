@@ -122,16 +122,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-#FRONTEND_URL = "http://127.0.0.1:8000/"
-FRONTEND_URL = "http://midilibrary.net/"
+FRONTEND_URL = "http://127.0.0.1:8000/"
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-#STATIC_ROOT = '/usr/share/nginx/html/static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-#MEDIA_ROOT = '/usr/share/nginx/html/media'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -158,5 +155,8 @@ if DEBUG:
     STRIPE_PUBLIC_KEY = 'pk_test_51JpQDyGsgRMaN0Z86I9qvBhYEgG0g4ylcF25kHtsmmJyF23qLZAjfMhqpKH0ucbbnBA96QuukaQMv36uP5tOIfFK0037FwfUst'
     STRIPE_SECRET_KEY = 'sk_test_51JpQDyGsgRMaN0Z8Y0WjlR18BsxzkQgVW1FQuDb10vUlwIrCpTNKtzBwkrbJqxej2K1U5cOd7UHMpFOcwrwPtT9500L5865O2R'
 else:
+    FRONTEND_URL = "http://midilibrary.net/"
+    STATIC_ROOT = '/usr/share/nginx/html/static'
+    MEDIA_ROOT = '/usr/share/nginx/html/media'
     STRIPE_PUBLIC_KEY = 'pk_live_51JpQDyGsgRMaN0Z8xuq2Z4HeOYMQIY6xkFVognWWWWnIRsb3pHlqFnuE1hYwAx0SHuRpYfg43IhQITFTMofJcmr000DNLB6hy2'
     STRIPE_SECRET_KEY = ''

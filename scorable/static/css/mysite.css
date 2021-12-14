@@ -1,3 +1,7 @@
+html {
+    --main-color:rgb(143, 31, 196);
+}
+
 img{
     user-select: none; /*写真クリック反応無効*/
 }

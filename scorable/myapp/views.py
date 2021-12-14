@@ -542,15 +542,10 @@ def likeC(request):
 
 def comment(request, pk):
     score = get_object_or_404(Score, pk=pk)
+    content = request.POST.get("content")
     if request.user.id: #ログインしてるか
-        form = CommentForm(request.POST, request.FILES)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.owner = request.user
-            comment.song = score
-            comment.save()
+        Comment.objects.create(owner=request.user, content=content, song=score)
 
-    
         data = {
 
         }

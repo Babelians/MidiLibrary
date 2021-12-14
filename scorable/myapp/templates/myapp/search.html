@@ -25,7 +25,7 @@
                     </div>
                     {% for tag in tags %}
                     {% if tag %}
-                    <a href="{% url 'search' %}?keyword={{ tag }}" style="color: blueviolet;">#{{ tag }}</a>
+                    <a href="{% url 'search' %}?keyword={{ tag }}" style="color: var(--main-color);">#{{ tag }}</a>
                     {% endif %}
                     {% endfor %}
                 </div>

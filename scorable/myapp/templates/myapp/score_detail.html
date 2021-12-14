@@ -16,18 +16,18 @@
         
         #seekbox{
             z-index: 9991;
-            /*position: fixed;*/
             width: 1150;
-            height: 10px;
+            height: 20px;
             background-color: rgb(216, 216, 216);
             margin-top: 8px;
-            /*bottom: 5%;*/
+            user-select: none;
         }
         #seekbar{
             z-index: 9993;
             width: 0px;
             height: 100%;
-            background-color: blueviolet;
+            background-color: var(--main-color);
+            user-select: none;
         }
         #seekbox:hover{
             cursor: pointer;
@@ -43,7 +43,7 @@
             /*z-index: 9993;*/
             width: 50%;
             height: 100%;
-            background-color: blueviolet;
+            background-color: var(--main-color);
             max-width: 100%;
         }
         .face{
@@ -68,7 +68,7 @@
             </div>
 
             <div style="margin-top: 15px;">
-                <div style="overflow: hidden; font-size: 20px;">
+                <div style="overflow: hidden; font-size: 20px; user-select: none;">
                     {{ score.song_name }}
                 </div>
                 <div id=seekbox>
@@ -179,33 +179,44 @@
                     let maxTime = document.createTextNode(t+":"+t2);
                     document.getElementById("total_time").appendChild(maxTime);
                 });
-    
-    
-                var seekBarFlg = false;
-                document.getElementById("seekbox").addEventListener("mousedown", (e)=>{
-                    seekBarFlg = true;
-                });
-    
-                let volumeBarFlg = false;
-                document.getElementById("volumebox").addEventListener("mousedown", (e)=>{
-                    volumeBarFlg = true;
-                });
-    
-                let my = 0;
-                document.addEventListener("mousemove", (e)=>{
-                    mdy = e.offsetY - my;
-                    my = e.offsetY;
+
+                function moveSeekbar(x){
                     if(seekBarFlg){
-                        document.getElementById("seekbar").style.width = e.offsetX+"px";
+                        if(0 < x-document.getElementById("seekbar").getBoundingClientRect().left &&
+                                x-document.getElementById("seekbar").getBoundingClientRect().left < document.getElementById("seekbox").clientWidth){
+                            document.getElementById("seekbar").style.width = x-document.getElementById("seekbox").getBoundingClientRect().left+"px";
+                        }
                     }
+                }
+
+                function moveVolumebar(x){
                     if(volumeBarFlg){
-                        document.getElementById("volumebar").style.width = e.clientX-document.getElementById("volumebox").getBoundingClientRect().left+"px";
+                        document.getElementById("volumebar").style.width = x-document.getElementById("volumebox").getBoundingClientRect().left+"px";
                         if(muteflg){
     
                         }else{
                             music.volume = document.getElementById("volumebar").clientWidth/document.getElementById("volumebox").clientWidth;
                         }
                     }
+                }
+                var seekBarFlg = false;
+                document.getElementById("seekbox").addEventListener("pointerdown", (e)=>{
+                    seekBarFlg = true;
+                    moveSeekbar(e.offsetX);
+                });
+    
+                let volumeBarFlg = false;
+                document.getElementById("volumebox").addEventListener("pointerdown", (e)=>{
+                    volumeBarFlg = true;
+                    moveVolumebar(e.clientX);
+                });
+    
+                let my = 0;
+                document.addEventListener("pointermove", (e)=>{
+                    mdy = e.offsetY - my;
+                    my = e.offsetY;
+                    moveSeekbar(e.clientX);
+                    moveVolumebar(e.clientX);
                     if(mouseTrackScrollDown){ 
                         moveScrollBar(mdy, trackScrollBar, 0, canvas.height);
                     }
@@ -225,7 +236,7 @@
     
                 let mouseX = -1;
                 let mouseY = -1;
-                canvas.addEventListener("mousemove", (e)=>{
+                canvas.addEventListener("pointermove", (e)=>{
                     mouseX = e.offsetX;
                     mouseY = e.offsetY;
                 });
@@ -242,7 +253,7 @@
                 let piaWid = 1150; //ピアノロールの横幅
                 let piaHei = 125;
     
-                canvas.addEventListener('mousedown', e=>{
+                canvas.addEventListener('pointerdown', e=>{
                     mouseDownFlg = true;
 
                     //トラックカラー選択画面が出ている時は反応しない
@@ -379,7 +390,21 @@
                     }
                 });*/
     
-                document.addEventListener('mouseup', e=>{
+                document.addEventListener('pointerup', e=>{
+                    mouseDownFlg = false;
+                    mouseTrackDown = false;
+                    mouseTrackScrollDown = false;
+                    volumeBarFlg = false;
+                    mdy = 0;
+                    if(seekBarFlg){
+                        maxms = music.duration*1000;
+                        time = maxms*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
+                        music.currentTime = music.duration*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
+                        seekBarFlg = false;
+                    }
+                });
+
+                document.addEventListener('pointercancel', e=>{
                     mouseDownFlg = false;
                     mouseTrackDown = false;
                     mouseTrackScrollDown = false;
@@ -1004,13 +1029,16 @@
             </script>
             <div class="comment">
                 <div style="display: flex; height: 50px;">
-                    <span style="font-size: 15px;"><i class="fas fa-play" style="color: gray;"></i>{{ score.play_count }}</span>
+                    <div style="font-size: 15px; display: flex;">
+                        <i class="fas fa-play" style="color: gray; margin-top: 2px;"></i>
+                        <div style="margin-left: 5px;">{{ score.play_count }}</div>
+                    </div>
                     {% if user.id %}
                     <i class="far fa-heart" id="Like" style="width: 20px; height: 20px; font-size: 20px; color: white; cursor: pointer; margin-left: 10px;"></i>
                     {% else %}
                     <span style="margin-left: 10px;">Like</span>
                     {% endif %}
-                    <div id="scoreHeartCount">{{ score.heart_count }}</div>
+                    <div id="scoreHeartCount" style="margin-left: 5px;">{{ score.heart_count }}</div>
                     <div style="margin: 0 0 0 auto;">
                         {% if not score.price or purchased %}
                         <a href="{{ score.midifile.url }}">Download</a>
@@ -1072,7 +1100,7 @@
                         <div style="margin-top: 20px;">
                             {% for tag in tags %}
                             {% if tag %}
-                                <a href="{% url 'search' %}?keyword={{tag}}" style="color: blueviolet;">#{{ tag }}</a>
+                                <a href="{% url 'search' %}?keyword={{tag}}" style="color: var(--main-color);">#{{ tag }}</a>
                             {% endif %}
                             {% endfor %}
                         </div>
@@ -1084,21 +1112,20 @@
                 <div style="border-bottom: 1px groove rgb(150, 150, 150); margin-top: 1%; width: 1150px;">
                     {% if user.id %}
                     <big>コメント</big>
-                    <!--<a href="{% url 'user_detail' pk=user.pk %}" ><img src="{{ user.face.url }}" style="width: 40px; height: 40px; border-radius: 50%;"/></a>-->
-                    <form method="POST" enctype="multipart/form-data" class="comment_form">
-                        {% csrf_token %}
-                        <!--{{ form.as_p }}-->
-                        <div id="id_comment">
-        
-                        </div>
-                        <button type="submit" id="comment" name="Comment" style="margin-top: 1%;">submit</button><br>
-                    </form>
+
+                    <div id="id_comment">
+                        <textarea id="id_content" style="width: 575px; height: 102px;" maxlength="2000"></textarea>
+                        <div></div>
+                        <div id="commentBtn" name="Comment" style="margin-top: 5px; cursor: pointer; width: 70px; background-color: var(--main-color); justify-content: center; display: flex;" onclick="sendComment()">送信</div>
+                    </div>
+                    
                     {% else %}
                     コメントをするには<a href="{% url 'login' %}">ログイン</a>してください
                     {% endif %}
+                    <div style="height: 10px;"></div>
                 </div>
                 
-                <div style="border-bottom: 1px groove rgb(150, 150, 150); margin-top:1%; width: 1150px;">
+                <div style="width: 1150px;">
                     {% for post in posts %}
                     <div class="comment_box" style="margin-top: 15px; display: flex;">
                         <div style="margin-top: 1px;">
@@ -1107,30 +1134,19 @@
                         <div class="name_and_comment">
                             <span style="font-size: 14px;">{{ post.owner.username }}</span>
                             <span style="color: rgb(122, 122, 122); font-size: 14px">{{ post.uploaded_at }}</span>
-                            <div style="font-size: 16px;">{{ post.content|linebreaksbr|urlize }}</div>
-                            <span style="display: flex;">
+                            <div style="font-size: 15px;">{{ post.content|linebreaksbr|urlize }}</div>
+                            <div style="display: flex; margin-top: 5px;">
                                 {% if user.id %}
-                                <i class="far fa-heart" id="{{ post.id }}" name="LikeC" data-value="{{ post.my_heart }}" style="width: 18px; height: 18px; font-size: 18px; color: white; cursor: pointer;"></i>
-                                <div id="LikeCSum{{ post.id }}" style="margin-left: 8px;">{{ post.heart_count }}</div>
+                                <i class="far fa-heart" id="{{ post.id }}" name="LikeC" data-value="{{ post.my_heart }}" style="font-size: 16px; color: white; cursor: pointer; margin-top: 2px;"></i>
+                                <div id="LikeCSum{{ post.id }}" style="margin-left: 5px; font-size: 14px;">{{ post.heart_count }}</div>
                                 {% endif %}
-                            </span>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
-                <br><br><br>
             </div>
 
-            <script>
-                let comment = document.createElement("textarea");
-                comment.id = "id_content";
-                comment.maxlength = "150";
-                comment.name = "content";
-                comment.style = "width: 50%; height: 7%;";
-                comment.required = true;
-                let parent = document.getElementById("id_comment");
-                parent.appendChild(comment);
-            </script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
             <script>
                 //AjaxのCSRFトークン start
@@ -1167,7 +1183,7 @@
                 if('{{ songHeartMyCount }}'>0){
                     scoreHeartMyCount = true;
                     document.getElementById("Like").className = "fas fa-heart";
-                    document.getElementById("Like").style.color = "rgb(200,0,0)";
+                    document.getElementById("Like").style.color = "var(--main-color)";
                 }
 
                 document.getElementById("Like").addEventListener('click', function(e){
@@ -1181,7 +1197,7 @@
                         scoreHeartCount.firstChild.remove();
                         scoreHeartCount.appendChild(newText);
                         document.getElementById("Like").className = "fas fa-heart";
-                        document.getElementById("Like").style.color = "rgb(200,0,0)";
+                        document.getElementById("Like").style.color = "var(--main-color)";
                     }else{
                         let scoreHeartCount = document.getElementById("scoreHeartCount");
                         let newText = document.createTextNode(parseInt(scoreHeartCount.innerText)-1);
@@ -1209,13 +1225,14 @@
                 });
 
                 let followMyCount = false; 
+                if("{{ user.id }}" != "{{ score.artist.id }}"){
                     if(parseInt('{{ followMyCount }}')>0){
                         followMyCount = true;
                         document.getElementById('following').style.display = "block";
                         document.getElementById("Follow").style.backgroundColor = "rgb(150, 150, 150)";
                     }else{
                         document.getElementById('notfollow').style.display = 'block';
-                        document.getElementById("Follow").style.backgroundColor = "blueviolet";
+                        document.getElementById("Follow").style.backgroundColor = "var(--main-color)";
                     }
 
                     document.getElementById("Follow").addEventListener('click', function(e){
@@ -1238,32 +1255,56 @@
                             let newText = document.createTextNode(parseInt(followCount.innerText)-1);
                             followCount.firstChild.remove();
                             followCount.appendChild(newText);
-                            document.getElementById("Follow").style.backgroundColor = "blueviolet";
+                            document.getElementById("Follow").style.backgroundColor = "var(--main-color)";
                         }
 
-                    $.ajax({
-                        //サーバに送信するリクエストの設定
-                        'url': '{% url "follow" pk=score.artist.pk %}',
-                        'type': 'POST',
-                        'data': {
+                        $.ajax({
+                            //サーバに送信するリクエストの設定
+                            'url': '{% url "follow" pk=score.artist.pk %}',
+                            'type': 'POST',
+                            'data': {
 
-                        },
-                        'dataType': 'json'
-                    })
-                    .done(function(){
-                        //通信成功時の処理
-                    })
-                    .fail(function(){
-                        //通信失敗時の処理
-                    })
-                });
+                            },
+                            'dataType': 'json'
+                        })
+                        .done(function(){
+                            //通信成功時の処理
+                        })
+                        .fail(function(){
+                            //通信失敗時の処理
+                        })
+                    });
+                }
+
+                function sendComment(){
+                    console.log("clicked");
+                    if(document.getElementById('id_content').value){
+                        $.ajax({
+                            //サーバに送信するリクエストの設定
+                            'url': '{% url "comment" pk=score.pk %}',
+                            'type': 'POST',
+                            'data': {
+                                'content': document.getElementById('id_content').value,
+                            },
+                            'dataType': 'json'
+                        })
+                        .done(function(){
+                            //通信成功時の処理
+                        })
+                        .fail(function(){
+                            //通信失敗時の処理
+                        })
+
+                        document.getElementById('id_content').value = null;
+                    }
+                }
 
                 let likecs = document.getElementsByName("LikeC");
                 for(let i=0;i<likecs.length;i++){
-                    console.log(likecs[i].dataset);
+                    console.log("aaaaaaaaaaaa");
                     if( likecs[i].dataset.value>0){
-                        likecs[i].className = className = "fas fa-heart";
-                        likecs[i].style.color = "rgb(200,0,0)";
+                        likecs[i].className = "fas fa-heart";
+                        likecs[i].style.color = "var(--main-color)";
                     }
                     likecs[i].addEventListener('click', function(e){
                         e.preventDefault();
@@ -1282,7 +1323,7 @@
                             scoreHeartCount.appendChild(newText);
                             e.target.dataset.value = 1;
                             e.target.className = "fas fa-heart";
-                            likecs[i].style.color = "rgb(200,0,0)";
+                            likecs[i].style.color = "var(--main-color)";
                         }
 
                         $.ajax({
@@ -1303,29 +1344,6 @@
 
                     });
                 }
-
-                document.getElementById('comment').addEventListener('click', function(e){
-                    e.preventDefault();
-                    $.ajax({
-                            //サーバに送信するリクエストの設定
-                            'url': '{% url "comment" pk=score.pk %}',
-                            'type': 'POST',
-                            'data': {
-                                'content': document.getElementById('id_content').value,
-                            },
-                            'dataType': 'json'
-                        })
-                        .done(function(){
-                            //通信成功時の処理
-                        })
-                        .fail(function(){
-                            //通信失敗時の処理
-                        })
-
-                        document.getElementById('id_content').value = null;
-                });
-
-
 
             </script>
         </div>

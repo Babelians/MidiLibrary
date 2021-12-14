@@ -76,7 +76,7 @@
             <div style="margin-top:80px;"></div>
 
         {% for t, scores in scores_tag.items %}
-            <div style="margin-left: 25px; font-size: 22px;"><a href="{% url 'search' %}?keyword={{t.name}}" style="color: blueviolet;">#{{ t.name }}</a></div>
+            <div style="margin-left: 25px; font-size: 22px;"><a href="{% url 'search' %}?keyword={{t.name}}" style="color: var(--main-color);">#{{ t.name }}</a></div>
             <div style="display: flex; flex-wrap: wrap; margin-top: 16px;">
                 {% for post in scores %}
                 <div style="display: inline; margin-left: 25px; width: 270px; overflow-wrap:break-word;">

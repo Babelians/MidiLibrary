@@ -155,7 +155,7 @@ if DEBUG:
     STRIPE_PUBLIC_KEY = 'pk_test_51JpQDyGsgRMaN0Z86I9qvBhYEgG0g4ylcF25kHtsmmJyF23qLZAjfMhqpKH0ucbbnBA96QuukaQMv36uP5tOIfFK0037FwfUst'
     STRIPE_SECRET_KEY = 'sk_test_51JpQDyGsgRMaN0Z8Y0WjlR18BsxzkQgVW1FQuDb10vUlwIrCpTNKtzBwkrbJqxej2K1U5cOd7UHMpFOcwrwPtT9500L5865O2R'
 else:
-    FRONTEND_URL = "http://midilibrary.net/"
+    FRONTEND_URL = "https://midilibrary.net/"
     STATIC_ROOT = '/usr/share/nginx/html/static'
     MEDIA_ROOT = '/usr/share/nginx/html/media'
     STRIPE_PUBLIC_KEY = 'pk_live_51JpQDyGsgRMaN0Z8xuq2Z4HeOYMQIY6xkFVognWWWWnIRsb3pHlqFnuE1hYwAx0SHuRpYfg43IhQITFTMofJcmr000DNLB6hy2'

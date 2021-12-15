@@ -202,7 +202,7 @@
                 var seekBarFlg = false;
                 document.getElementById("seekbox").addEventListener("pointerdown", (e)=>{
                     seekBarFlg = true;
-                    moveSeekbar(e.offsetX);
+                    moveSeekbar(e.clientX);
                 });
     
                 let volumeBarFlg = false;
@@ -278,10 +278,10 @@
                         if(e.offsetX<=trackWid+tracks_x){
                             my = e.offsetY;
                             mouseTrackDown = true;
-                        if(e.offsetX>=trackWid+tracks_x-trackScrollBar.wid&&e.offsetX<=trackWid+tracks_x&&e.offsetY<trackScrollBar.y+trackScrollBar.hei&&e.offsetY>trackScrollBar.y){
+                            if(e.offsetX>=trackWid+tracks_x-trackScrollBar.wid&&e.offsetX<=trackWid+tracks_x&&e.offsetY<trackScrollBar.y+trackScrollBar.hei&&e.offsetY>trackScrollBar.y){
                             mouseTrackScrollDown = true;
+                            }
                         }
-                    }
                     }
     
                     //トラックカラー選択

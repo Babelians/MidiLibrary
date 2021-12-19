@@ -55,14 +55,14 @@
         }
     </style>
 
-    <div class="content" style="display: flex; flex-wrap: wrap;">
-        <div class="inner-content">
+    <div class="content" id="content" style="display: flex; flex-wrap: wrap;">
+        <div class="score-content" id="inner-content" style="width: 1150;">
 
             <audio id=audio>
                 <source src="{{ score.musicfile.url }}">
             </audio>
-            <div id="score" style=" width: 1150; height: 650px; display: flex; justify-content: center; overflow: hidden;">
-                <img src="{{ score.score_art.url }}" style="height: 65000px; filter: brightness(50%);"/>
+            <div id="score" style=" width: 1150px; height: 650px; display: flex; justify-content: center; overflow: hidden;">
+                <img src="{{ score.score_art.url }}" style="height: 65000px; width: 100%; filter: brightness(50%);"/>
                 <img id="score_art" src="{{ score.score_art.url }}" style="height: 650px; filter: brightness(50%);"/>
                 <canvas id="myCanvas" width="1150" height="650" style="position: absolute;"></canvas>
             </div>
@@ -74,7 +74,7 @@
                 <div id=seekbox>
                     <div id=seekbar></div>
                 </div>
-                <footer class="footer">
+                <footer class="footer" style="width: 100%;">
                     <div class="fcontainer" id="fcontainer" style="display: flex;">
                         {% load static %}
                         <div class="passive">
@@ -107,6 +107,126 @@
                         </div>
                     </div>
                 </footer>
+                <div class="comment">
+                    <div style="display: flex; height: 50px;">
+                        <div style="font-size: 15px; display: flex;">
+                            <i class="fas fa-play" style="color: gray; margin-top: 2px;"></i>
+                            <div style="margin-left: 5px;">{{ score.play_count }}</div>
+                        </div>
+                        {% if user.id %}
+                        <i class="far fa-heart" id="Like" style="width: 20px; height: 20px; font-size: 20px; color: white; cursor: pointer; margin-left: 10px;"></i>
+                        {% else %}
+                        <span style="margin-left: 10px;">Like</span>
+                        {% endif %}
+                        <div id="scoreHeartCount" style="margin-left: 5px;">{{ score.heart_count }}</div>
+                        <div style="margin: 0 0 0 auto;">
+                            {% if not score.price or purchased %}
+                            <a href="{{ score.midifile.url }}">Download</a>
+                            {% endif %}
+                            <!-- 購入ボタン・フォームの作成 -->
+                            {% if user.is_authenticated and score.price and not purchased %}
+                            <form action="" method="POST">
+                                <script
+                                    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                    data-key="{{ public_key }}"
+                                    data-amount="{{ score.price }}"
+                                    data-name="Midi Libraly"
+                                    data-description="{{ score.song_name }}"
+                                    data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                                    data-locale="ja"
+                                    data-currency="{{ currency }}"
+                                    data-email="{{ user.email }}">
+                                </script>
+                                {% csrf_token %}
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="display: block; margin-top: 10px; border-top: 1px groove rgb(150, 150, 150); width: 100%;
+                    border-bottom: 1px groove rgb(150, 150, 150);">
+                        <!--<span style="font-size: 20px; margin: 0 auto;">{{ score.song_name }}</span>-->
+    
+                        <div style="display: flex; margin-top: 10px;">
+                            <a href="{% url 'user_detail' pk=score.artist.pk %}">
+                                <img src="{{ score.artist.face.url }}" style="width: 35px; height: 35px; border-radius: 50%;vertical-align: middle;"/>
+                            </a>
+                            <div style="display: block; margin: 0 0 0 10;">
+                                <div style="margin-left: 3px;">{{ score.artist.username }}</div>
+                                <div style="display: flex; font-size: 12px;">フォロワー<div id="followCount">{{ score.artist.subscriber }}</div></div>
+                            </div>
+                            {% if user.id %}
+                            {% if user.id != score.artist.id  %}
+                            <button type="submit" id="Follow" name="Follow" style="margin: 0 0 0 auto; width: 120px; height: 40px;">
+                                <div id="following" style="display: none;">Following</div>
+                                <div id="notfollow" style="display: none;">Follow</div>
+                            </button>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+    
+                        <div style="margin-top: 8px; margin-left: 40px;">
+                            {% if score.explanation %}
+                                <div style="margin-top: 20px;">{{ score.explanation|linebreaksbr|urlize }}</div>
+                            {% endif %}
+                            {% if score.albam %}
+                            <div style="display: flex; margin-top: 20px;">
+                                <a href="{% url 'albam_detail' pk=score.albam.pk %}"><img src="{{ score.albam.art.url }}" style="width: 80px; height: 80px;"></a>
+                                <div>
+                                    <div style="margin-left: 10px;">{{ score.albam.albam_title }}</div>
+                                    <div style="margin-left: 10px; font-size: 14px;">{{ score.albam.uploaded_at }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div style="margin-top: 20px;">
+                                {% for tag in tags %}
+                                {% if tag %}
+                                    <a href="{% url 'search' %}?keyword={{tag}}" style="color: var(--main-color);">#{{ tag }}</a>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <br>
+                        </div>
+    
+                    </div>
+    
+                    <div style="border-bottom: 1px groove rgb(150, 150, 150); margin-top: 1%; width: 100%;">
+                        {% if user.id %}
+                        <big>コメント</big>
+    
+                        <div id="id_comment">
+                            <textarea id="id_content" style="width: 575px; height: 102px;" maxlength="2000"></textarea>
+                            <div></div>
+                            <div id="commentBtn" name="Comment" style="margin-top: 5px; cursor: pointer; width: 70px; background-color: var(--main-color); justify-content: center; display: flex;" onclick="sendComment()">送信</div>
+                        </div>
+                        
+                        {% else %}
+                        コメントをするには<a href="{% url 'login' %}">ログイン</a>してください
+                        {% endif %}
+                        <div style="height: 10px;"></div>
+                    </div>
+                    
+                    <div style="width: 100%;">
+                        {% for post in posts %}
+                        <div class="comment_box" style="margin-top: 15px; display: flex;">
+                            <div style="margin-top: 1px;">
+                                <a class="face" href="{% url 'user_detail' pk=post.owner_id %}" ><img src="{{ post.owner.face.url }}" style="width: 35px; height: 35px; border-radius: 50%;"/></a>
+                            </div>
+                            <div class="name_and_comment">
+                                <span style="font-size: 14px;">{{ post.owner.username }}</span>
+                                <span style="color: rgb(122, 122, 122); font-size: 14px">{{ post.uploaded_at }}</span>
+                                <div style="font-size: 15px;">{{ post.content|linebreaksbr|urlize }}</div>
+                                <div style="display: flex; margin-top: 5px;">
+                                    {% if user.id %}
+                                    <i class="far fa-heart" id="{{ post.id }}" name="LikeC" data-value="{{ post.my_heart }}" style="font-size: 16px; color: white; cursor: pointer; margin-top: 2px;"></i>
+                                    <div id="LikeCSum{{ post.id }}" style="margin-left: 5px; font-size: 14px;">{{ post.heart_count }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div style="height: 20px;"></div>
+                </div>
             </div>
     
             {{ note|json_script:"note" }}
@@ -250,7 +370,7 @@
                 var mouseTrackScrollDown = false;
                 var mouseOnScrollBar = false;
                 var mdy = 0;
-                let piaWid = 1150; //ピアノロールの横幅
+                let piaWid = canvas.width; //ピアノロールの横幅
                 let piaHei = 125;
     
                 canvas.addEventListener('pointerdown', e=>{
@@ -910,6 +1030,40 @@
                 }
 
                 let trackDisplayFlg = false;
+
+                function resize(){
+                    let contentWidth = document.getElementById("content").clientWidth;
+                    if(1016<contentWidth){
+                        widthMinus = 1500 - contentWidth;
+                        document.getElementById("inner-content").style.width = 1150 - widthMinus;
+                        let iContentWidth = document.getElementById("inner-content").clientWidth;
+                        document.getElementById("score").style.width = iContentWidth;
+                        document.getElementById("score").style.height = iContentWidth*650/1150;
+                        canvas.width = iContentWidth;
+                        canvas.height = iContentWidth*650/1150;
+                        piaWid = iContentWidth;
+                        piaHei = piaWid*125/1150;
+                        document.getElementById("seekbar").style.width = iContentWidth*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
+                        document.getElementById("seekbox").style.width = iContentWidth;
+                        whitekey = piaWid/52; //白鍵の横幅
+                        blackkey = piaWid/88;
+                        document.getElementById("score_art").style.height = canvas.height;
+                    }else{
+                        document.getElementById("inner-content").style.width = "100%";
+                        let iContentWidth = document.getElementById("inner-content").clientWidth;
+                        document.getElementById("score").style.width = iContentWidth;
+                        document.getElementById("score").style.height = iContentWidth*650/1150;
+                        canvas.width = iContentWidth;
+                        canvas.height = iContentWidth*650/1150;
+                        piaWid = iContentWidth;
+                        piaHei = piaWid*125/1150;
+                        document.getElementById("seekbar").style.width = iContentWidth*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
+                        document.getElementById("seekbox").style.width = iContentWidth;
+                        whitekey = piaWid/52; //白鍵の横幅
+                        blackkey = piaWid/88;
+                        document.getElementById("score_art").style.height = canvas.height;
+                    }
+                }
     
                 //線画
                 let interv = 20;
@@ -923,6 +1077,8 @@
                     let t = Math.floor(time/1000/60);
                     let t2 = zeroPadding(Math.floor(time/1000%60), 2);
                     document.getElementById("current_time").childNodes[1].data = t+":"+t2+"/";
+
+                    resize();
     
                     ctx.clearRect(0, 0, canvas.width, canvas.height); 
     
@@ -1027,125 +1183,6 @@
                 }
     
             </script>
-            <div class="comment">
-                <div style="display: flex; height: 50px;">
-                    <div style="font-size: 15px; display: flex;">
-                        <i class="fas fa-play" style="color: gray; margin-top: 2px;"></i>
-                        <div style="margin-left: 5px;">{{ score.play_count }}</div>
-                    </div>
-                    {% if user.id %}
-                    <i class="far fa-heart" id="Like" style="width: 20px; height: 20px; font-size: 20px; color: white; cursor: pointer; margin-left: 10px;"></i>
-                    {% else %}
-                    <span style="margin-left: 10px;">Like</span>
-                    {% endif %}
-                    <div id="scoreHeartCount" style="margin-left: 5px;">{{ score.heart_count }}</div>
-                    <div style="margin: 0 0 0 auto;">
-                        {% if not score.price or purchased %}
-                        <a href="{{ score.midifile.url }}">Download</a>
-                        {% endif %}
-                        <!-- 購入ボタン・フォームの作成 -->
-                        {% if user.is_authenticated and score.price and not purchased %}
-                        <form action="" method="POST">
-                            <script
-                                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                                data-key="{{ public_key }}"
-                                data-amount="{{ score.price }}"
-                                data-name="Midi Libraly"
-                                data-description="{{ score.song_name }}"
-                                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-                                data-locale="ja"
-                                data-currency="{{ currency }}"
-                                data-email="{{ user.email }}">
-                            </script>
-                            {% csrf_token %}
-                        </form>
-                        {% endif %}
-                    </div>
-                </div>
-                <div style="display: block; margin-top: 10px; border-top: 1px groove rgb(150, 150, 150); width: 1150px;
-                border-bottom: 1px groove rgb(150, 150, 150); width: 1150px;">
-                    <!--<span style="font-size: 20px; margin: 0 auto;">{{ score.song_name }}</span>-->
-
-                    <div style="display: flex; margin-top: 10px;">
-                        <a href="{% url 'user_detail' pk=score.artist.pk %}">
-                            <img src="{{ score.artist.face.url }}" style="width: 35px; height: 35px; border-radius: 50%;vertical-align: middle;"/>
-                        </a>
-                        <div style="display: block; margin: 0 0 0 10;">
-                            <div style="margin-left: 3px;">{{ score.artist.username }}</div>
-                            <div style="display: flex; font-size: 12px;">フォロワー<div id="followCount">{{ score.artist.subscriber }}</div></div>
-                        </div>
-                        {% if user.id %}
-                        {% if user.id != score.artist.id  %}
-                        <button type="submit" id="Follow" name="Follow" style="margin: 0 0 0 auto; width: 120px; height: 40px;">
-                            <div id="following" style="display: none;">Following</div>
-                            <div id="notfollow" style="display: none;">Follow</div>
-                        </button>
-                        {% endif %}
-                        {% endif %}
-                    </div>
-
-                    <div style="margin-top: 8px; margin-left: 40px;">
-                        {% if score.explanation %}
-                            <div style="margin-top: 20px;">{{ score.explanation|linebreaksbr|urlize }}</div>
-                        {% endif %}
-                        {% if score.albam %}
-                        <div style="display: flex; margin-top: 20px;">
-                            <a href="{% url 'albam_detail' pk=score.albam.pk %}"><img src="{{ score.albam.art.url }}" style="width: 80px; height: 80px;"></a>
-                            <div>
-                                <div style="margin-left: 10px;">{{ score.albam.albam_title }}</div>
-                                <div style="margin-left: 10px; font-size: 14px;">{{ score.albam.uploaded_at }}</div>
-                            </div>
-                        </div>
-                        {% endif %}
-                        <div style="margin-top: 20px;">
-                            {% for tag in tags %}
-                            {% if tag %}
-                                <a href="{% url 'search' %}?keyword={{tag}}" style="color: var(--main-color);">#{{ tag }}</a>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                        <br>
-                    </div>
-
-                </div>
-
-                <div style="border-bottom: 1px groove rgb(150, 150, 150); margin-top: 1%; width: 1150px;">
-                    {% if user.id %}
-                    <big>コメント</big>
-
-                    <div id="id_comment">
-                        <textarea id="id_content" style="width: 575px; height: 102px;" maxlength="2000"></textarea>
-                        <div></div>
-                        <div id="commentBtn" name="Comment" style="margin-top: 5px; cursor: pointer; width: 70px; background-color: var(--main-color); justify-content: center; display: flex;" onclick="sendComment()">送信</div>
-                    </div>
-                    
-                    {% else %}
-                    コメントをするには<a href="{% url 'login' %}">ログイン</a>してください
-                    {% endif %}
-                    <div style="height: 10px;"></div>
-                </div>
-                
-                <div style="width: 1150px;">
-                    {% for post in posts %}
-                    <div class="comment_box" style="margin-top: 15px; display: flex;">
-                        <div style="margin-top: 1px;">
-                            <a class="face" href="{% url 'user_detail' pk=post.owner_id %}" ><img src="{{ post.owner.face.url }}" style="width: 35px; height: 35px; border-radius: 50%;"/></a>
-                        </div>
-                        <div class="name_and_comment">
-                            <span style="font-size: 14px;">{{ post.owner.username }}</span>
-                            <span style="color: rgb(122, 122, 122); font-size: 14px">{{ post.uploaded_at }}</span>
-                            <div style="font-size: 15px;">{{ post.content|linebreaksbr|urlize }}</div>
-                            <div style="display: flex; margin-top: 5px;">
-                                {% if user.id %}
-                                <i class="far fa-heart" id="{{ post.id }}" name="LikeC" data-value="{{ post.my_heart }}" style="font-size: 16px; color: white; cursor: pointer; margin-top: 2px;"></i>
-                                <div id="LikeCSum{{ post.id }}" style="margin-left: 5px; font-size: 14px;">{{ post.heart_count }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
             <script>

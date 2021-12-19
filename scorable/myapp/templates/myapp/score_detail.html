@@ -64,7 +64,7 @@
             <div id="score" style=" width: 1150px; height: 650px; display: flex; justify-content: center; overflow: hidden;">
                 <img src="{{ score.score_art.url }}" style="height: 65000px; width: 100%; filter: brightness(50%);"/>
                 <img id="score_art" src="{{ score.score_art.url }}" style="height: 650px; filter: brightness(50%);"/>
-                <canvas id="myCanvas" width="1150" height="650" style="position: absolute;"></canvas>
+                <canvas id="myCanvas" style="position: absolute;"></canvas>
             </div>
 
             <div style="margin-top: 15px;">
@@ -1033,36 +1033,27 @@
 
                 function resize(){
                     let contentWidth = document.getElementById("content").clientWidth;
+                    let iContentWidth = document.getElementById("inner-content").clientWidth;
+                    let retinaWidth = iContentWidth*window.devicePixelRatio;
                     if(1016<contentWidth){
                         widthMinus = 1500 - contentWidth;
                         document.getElementById("inner-content").style.width = 1150 - widthMinus;
-                        let iContentWidth = document.getElementById("inner-content").clientWidth;
-                        document.getElementById("score").style.width = iContentWidth;
-                        document.getElementById("score").style.height = iContentWidth*650/1150;
-                        canvas.width = iContentWidth;
-                        canvas.height = iContentWidth*650/1150;
-                        piaWid = iContentWidth;
-                        piaHei = piaWid*125/1150;
-                        document.getElementById("seekbar").style.width = iContentWidth*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
-                        document.getElementById("seekbox").style.width = iContentWidth;
-                        whitekey = piaWid/52; //白鍵の横幅
-                        blackkey = piaWid/88;
-                        document.getElementById("score_art").style.height = canvas.height;
                     }else{
                         document.getElementById("inner-content").style.width = "100%";
-                        let iContentWidth = document.getElementById("inner-content").clientWidth;
-                        document.getElementById("score").style.width = iContentWidth;
-                        document.getElementById("score").style.height = iContentWidth*650/1150;
-                        canvas.width = iContentWidth;
-                        canvas.height = iContentWidth*650/1150;
-                        piaWid = iContentWidth;
-                        piaHei = piaWid*125/1150;
-                        document.getElementById("seekbar").style.width = iContentWidth*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
-                        document.getElementById("seekbox").style.width = iContentWidth;
-                        whitekey = piaWid/52; //白鍵の横幅
-                        blackkey = piaWid/88;
-                        document.getElementById("score_art").style.height = canvas.height;
                     }
+                    document.getElementById("score").style.width = iContentWidth;
+                    document.getElementById("score").style.height = iContentWidth*650/1150;
+                    canvas.width = retinaWidth;
+                    canvas.height = retinaWidth*650/1150;
+                    piaWid = retinaWidth;
+                    piaHei = piaWid*125/1150;
+                    document.getElementById("seekbar").style.width = iContentWidth*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
+                    document.getElementById("seekbox").style.width = iContentWidth;
+                    whitekey = piaWid/52; //白鍵の横幅
+                    blackkey = piaWid/88;
+                    document.getElementById("score_art").style.height = iContentWidth*650/1150;
+                    canvas.style.width = iContentWidth;
+                    canvas.style.height = iContentWidth*650/1150;
                 }
     
                 //線画
@@ -1077,10 +1068,10 @@
                     let t = Math.floor(time/1000/60);
                     let t2 = zeroPadding(Math.floor(time/1000%60), 2);
                     document.getElementById("current_time").childNodes[1].data = t+":"+t2+"/";
-
-                    resize();
     
                     ctx.clearRect(0, 0, canvas.width, canvas.height); 
+
+                    resize();
     
                     soloTrackJadge();
     
@@ -1314,7 +1305,6 @@
                 }
 
                 function sendComment(){
-                    console.log("clicked");
                     if(document.getElementById('id_content').value){
                         $.ajax({
                             //サーバに送信するリクエストの設定
@@ -1338,7 +1328,6 @@
 
                 let likecs = document.getElementsByName("LikeC");
                 for(let i=0;i<likecs.length;i++){
-                    console.log("aaaaaaaaaaaa");
                     if( likecs[i].dataset.value>0){
                         likecs[i].className = "fas fa-heart";
                         likecs[i].style.color = "var(--main-color)";

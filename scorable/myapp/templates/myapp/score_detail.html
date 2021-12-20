@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
     <style>
         #score_art{
             z-index: 1;
@@ -52,6 +53,14 @@
         }
         .name_and_comment{
             margin-left: 12px;
+        }
+        #nextPlay{
+            margin-left: 20px;
+        }
+        @media screen and (max-width: 1016px) {
+            #nextPlay{
+                margin-left: 0px;
+            }
         }
     </style>
 
@@ -121,7 +130,7 @@
                         <div id="scoreHeartCount" style="margin-left: 5px;">{{ score.heart_count }}</div>
                         <div style="margin: 0 0 0 auto;">
                             {% if not score.price or purchased %}
-                            <a href="{{ score.midifile.url }}">Download</a>
+                            <a href="{{ score.midifile.url }}"><div style="display: flex; align-items: center; justify-content: center; width: 120px; height: 40px; background-color: var(--main-color);">Download</div></a>
                             {% endif %}
                             <!-- 購入ボタン・フォームの作成 -->
                             {% if user.is_authenticated and score.price and not purchased %}
@@ -235,6 +244,7 @@
             {{ tempo|json_script:"tempo" }}
             {{ mid_h_track|json_script:"mid_h_track" }}
             {{ trackname|json_script:"trackname" }}
+            {{ barSplit|json_script:"barSplit" }}
             
             <script>
                 var tempo = JSON.parse(document.getElementById('tempo').textContent);
@@ -243,6 +253,7 @@
                 var maxdt = JSON.parse(document.getElementById('maxdt').textContent);
                 var mid_h_track = JSON.parse(document.getElementById('mid_h_track').textContent);
                 var trackname = JSON.parse(document.getElementById('trackname').textContent);
+                var barSplit = JSON.parse(document.getElementById('barSplit').textContent);
     
     
                 //maxdtTime = (tempo[0][1]/480)*(maxdt/1000);
@@ -856,23 +867,24 @@
                 }
                 //テンポ
                 let currentTempo = tempo[0][1];
-                let notePos = 0;
-    
+                let dTime = 0;
+
+                //時間をデルタタイム変換 (sum-time)/(tempo[i][1]/(480*1000))
                 //常にノートの位置をテンポの変化分加減する
                 function changeTempo(time){
                     currentTempo = tempo[0][1];
                     let sum = 0;
-                    notePos = 0;
+                    dTime = 0;
                     for(let i=0;i<tempo.length;i++){
                         if(i+1==tempo.length){ //最後のテンポチェンジの時
-                            notePos += (time-sum)/(tempo[i][1]/(480*1000));
+                            dTime += Math.floor((time-sum)/(tempo[i][1]/(480*1000)));
                         }else{
-                            sum += tempo[i][1]/(480*1000)*(tempo[i+1][0]-tempo[i][0]); //今のテンポ終了までの合計時間 = 次のテンポまでの時間
-                            if(sum<=time){
-                                notePos += tempo[i][1]/(480*1000)*(tempo[i+1][0]-tempo[i][0])/(tempo[i][1]/(480*1000));
+                            sum += tempo[i][1]/(480*1000)*(tempo[i+1][0]-tempo[i][0]); //今のテンポ終了までの合計時間[ms]
+                            if(sum<=time){ //今のテンポが次以降のテンポの場合
+                                dTime += Math.floor(tempo[i+1][0]-tempo[i][0]); //過ぎた分のデルタタイムを入れる
                                 currentTempo = tempo[i][1];
                             }else{
-                                notePos += tempo[i][1]/(480*1000)*(tempo[i+1][0]-tempo[i][0])/(tempo[i][1]/(480*1000))-(sum-time)/(tempo[i][1]/(480*1000));
+                                dTime += Math.floor((tempo[i+1][0]-tempo[i][0])-(sum-time)/(tempo[i][1]/(480*1000)));
                                 break;
                             }
                         }
@@ -895,22 +907,47 @@
                     ctx.fill();
                     ctx.closePath();
                 }
+
+                //==========================
+                //表示する小節番号の配列を作る
+                //==========================
+                let enableBar = new Array(mid_h_track-1);
+                for(let i=0;i<enableBar.length;i++){
+                    enableBar[i] = new Array();
+                }
+                let visibleBar = 4; //表示する小節数
+                function judgeEnableBar(){ //表示するノートを小節で決める
+                    for(let i=0;i<mid_h_track-1;i++){ //トラック数
+                        enableBar[i].length = 0;
+                        if(soloflg==false||soloSel[i]==true){
+                            for(let j=0;j<note[i+1].length;j++){ //小節数
+                                if((note[i+1][j][0] <= dTime && dTime <= note[i+1][j][1])|| (dTime <= note[i+1][j][0] && note[i+1][j][0] <= dTime + visibleBar*480*4)){
+                                    enableBar[i].push(j);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 //============================================================
-                //ピアノロール     tempo/(480*1000)は1デルタタイム当たりのMS 192.168.0.51:8000
+                //ピアノロール     tempo/(480*1000)は1デルタタイム当たりのMS 
                 //============================================================
                 let piakey = new Array(mid_h_track-1);
                 for(let i=0;i<mid_h_track-1;i++){
                     piakey[i] = new Array(88);
                 }
-                function keyon(track, time){
+
+                function keyon(track){
                     for(let k=0;k<mid_h_track-1;k++){ //トラック別
                         if(soloflg==false||soloSel[k]==true){
                             for(let i=0;i<piakey[k].length;i++){ //鍵盤別
                                 piakey[k][i] = 0;
-                                for(let j=0;j<note[k+1].length;j++){
-                                    if(i==note[k+1][j][1]-24+3&&note[k+1][j][0]<=notePos&&note[k+1][j][3]>notePos){ //-24+3はピアノ上の左端のド
-                                        piakey[k][note[k+1][j][1]-24+3] = 1;
-                                        break;
+                                for(let b=0;b<enableBar[k].length;b++){
+                                    for(let j=0;j<note[k+1][enableBar[k][b]][2].length;j++){
+                                        if(i==note[k+1][enableBar[k][b]][2][j][1]-24+3&&note[k+1][enableBar[k][b]][2][j][0]<=dTime&&note[k+1][enableBar[k][b]][2][j][3]>dTime){ //-24+3はピアノ上の左端のド
+                                            piakey[k][note[k+1][enableBar[k][b]][2][j][1]-24+3] = 1;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -944,25 +981,27 @@
                 let blackkey = piaWid/88; //黒鍵の横幅
                 let midiSpeed = 6; //流れる速さ
                 let midiSprit = 10/midiSpeed; //midiとmidiの間
-                function drawPRoll(track, time){
+                function drawPRoll(track){
                     for(let j=0;j<mid_h_track-1;j++){
                         if(soloflg==false||soloSel[j]==true){
-                            for(let i=0;i<note[j+1].length;i++){
-                                if(note[j+1][i][1]%12==0||note[j+1][i][1]%12==5){
-                                    bRect(trackWid+tracks_x+2*whitekey+(note[j+1][i][1]-24)*(piaWid-whitekey*3)/84, canvas.height-piaHei+(-note[j+1][i][0]+notePos)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][i][3]-note[j+1][i][0])/midiSpeed+midiSprit, c_rgba[j]);  
-                                }else if(note[j+1][i][1]%12==2){
-                                    bRect(trackWid+tracks_x+2*whitekey+(note[j+1][i][1]-24)*(piaWid-whitekey*3)/84-7*whitekey/42, canvas.height-piaHei+(-note[j+1][i][0]+notePos)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][i][3]-note[j+1][i][0])/midiSpeed+midiSprit, c_rgba[j]);    
-                                }else if(note[j+1][i][1]%12==4){
-                                    bRect(trackWid+tracks_x+2*whitekey+(note[j+1][i][1]-24)*(piaWid-whitekey*3)/84-7*whitekey/21, canvas.height-piaHei+(-note[j+1][i][0]+notePos)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][i][3]-note[j+1][i][0])/midiSpeed+midiSprit, c_rgba[j]);  
-                                }else if(note[j+1][i][1]%12==7){ 
-                                    bRect(trackWid+tracks_x+2*whitekey+(note[j+1][i][1]-24)*(piaWid-whitekey*3)/84-7*whitekey/84, canvas.height-piaHei+(-note[j+1][i][0]+notePos)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][i][3]-note[j+1][i][0])/midiSpeed+midiSprit, c_rgba[j]);  
-                                }else if(note[j+1][i][1]%12==9){
-                                    bRect(trackWid+tracks_x+2*whitekey+(note[j+1][i][1]-24)*(piaWid-whitekey*3)/84-7*whitekey/28, canvas.height-piaHei+(-note[j+1][i][0]+notePos)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][i][3]-note[j+1][i][0])/midiSpeed+midiSprit, c_rgba[j]);    
-                                }else if(note[j+1][i][1]%12==11){
-                                    bRect(trackWid+tracks_x+2*whitekey+(note[j+1][i][1]-24)*(piaWid-whitekey*3)/84-5*7*whitekey/84, canvas.height-piaHei+(-note[j+1][i][0]+notePos)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][i][3]-note[j+1][i][0])/midiSpeed+midiSprit, c_rgba[j]); 
-                                }
-                                else{
-                                    bRect(trackWid+tracks_x+2*whitekey+(note[j+1][i][1]-24)*(piaWid-whitekey*3)/84, canvas.height-piaHei+(-note[j+1][i][0]+notePos)/midiSpeed, (piaWid-whitekey*3)/84, -(note[j+1][i][3]-note[j+1][i][0])/midiSpeed+midiSprit, c_rgba[j]);   
+                            for(let b=0;b<enableBar[j].length;b++){
+                                for(let i=0;i<note[j+1][enableBar[j][b]][2].length;i++){
+                                    if(note[j+1][enableBar[j][b]][2][i][1]%12==0||note[j+1][enableBar[j][b]][2][i][1]%12==5){
+                                        bRect(trackWid+tracks_x+2*whitekey+(note[j+1][enableBar[j][b]][2][i][1]-24)*(piaWid-whitekey*3)/84, canvas.height-piaHei+(-note[j+1][enableBar[j][b]][2][i][0]+dTime)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][enableBar[j][b]][2][i][3]-note[j+1][enableBar[j][b]][2][i][0])/midiSpeed+midiSprit, c_rgba[j]);  
+                                    }else if(note[j+1][enableBar[j][b]][2][i][1]%12==2){
+                                        bRect(trackWid+tracks_x+2*whitekey+(note[j+1][enableBar[j][b]][2][i][1]-24)*(piaWid-whitekey*3)/84-7*whitekey/42, canvas.height-piaHei+(-note[j+1][enableBar[j][b]][2][i][0]+dTime)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][enableBar[j][b]][2][i][3]-note[j+1][enableBar[j][b]][2][i][0])/midiSpeed+midiSprit, c_rgba[j]);    
+                                    }else if(note[j+1][enableBar[j][b]][2][i][1]%12==4){
+                                        bRect(trackWid+tracks_x+2*whitekey+(note[j+1][enableBar[j][b]][2][i][1]-24)*(piaWid-whitekey*3)/84-7*whitekey/21, canvas.height-piaHei+(-note[j+1][enableBar[j][b]][2][i][0]+dTime)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][enableBar[j][b]][2][i][3]-note[j+1][enableBar[j][b]][2][i][0])/midiSpeed+midiSprit, c_rgba[j]);  
+                                    }else if(note[j+1][enableBar[j][b]][2][i][1]%12==7){ 
+                                        bRect(trackWid+tracks_x+2*whitekey+(note[j+1][enableBar[j][b]][2][i][1]-24)*(piaWid-whitekey*3)/84-7*whitekey/84, canvas.height-piaHei+(-note[j+1][enableBar[j][b]][2][i][0]+dTime)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][enableBar[j][b]][2][i][3]-note[j+1][enableBar[j][b]][2][i][0])/midiSpeed+midiSprit, c_rgba[j]);  
+                                    }else if(note[j+1][enableBar[j][b]][2][i][1]%12==9){
+                                        bRect(trackWid+tracks_x+2*whitekey+(note[j+1][enableBar[j][b]][2][i][1]-24)*(piaWid-whitekey*3)/84-7*whitekey/28, canvas.height-piaHei+(-note[j+1][enableBar[j][b]][2][i][0]+dTime)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][enableBar[j][b]][2][i][3]-note[j+1][enableBar[j][b]][2][i][0])/midiSpeed+midiSprit, c_rgba[j]);    
+                                    }else if(note[j+1][enableBar[j][b]][2][i][1]%12==11){
+                                        bRect(trackWid+tracks_x+2*whitekey+(note[j+1][enableBar[j][b]][2][i][1]-24)*(piaWid-whitekey*3)/84-5*7*whitekey/84, canvas.height-piaHei+(-note[j+1][enableBar[j][b]][2][i][0]+dTime)/midiSpeed, 12/7*(piaWid-whitekey*3)/84, -(note[j+1][enableBar[j][b]][2][i][3]-note[j+1][enableBar[j][b]][2][i][0])/midiSpeed+midiSprit, c_rgba[j]); 
+                                    }
+                                    else{
+                                        bRect(trackWid+tracks_x+2*whitekey+(note[j+1][enableBar[j][b]][2][i][1]-24)*(piaWid-whitekey*3)/84, canvas.height-piaHei+(-note[j+1][enableBar[j][b]][2][i][0]+dTime)/midiSpeed, (piaWid-whitekey*3)/84, -(note[j+1][enableBar[j][b]][2][i][3]-note[j+1][enableBar[j][b]][2][i][0])/midiSpeed+midiSprit, c_rgba[j]);   
+                                    }
                                 }
                             }
                         }
@@ -1038,6 +1077,7 @@
                     if(1016<contentWidth){
                         widthMinus = 1500 - contentWidth;
                         document.getElementById("inner-content").style.width = 1150 - widthMinus;
+                        //document.getElementById("nextPlay").style.marginLeft = 20;
                     }else{
                         document.getElementById("inner-content").style.width = "100%";
                     }
@@ -1059,6 +1099,8 @@
                 //線画
                 let interv = 20;
                 let dt = interv;
+                let dTime_o = -480;
+                judgeEnableBar();
                 function draw(){
     
                     //time += dt;
@@ -1074,10 +1116,15 @@
                     resize();
     
                     soloTrackJadge();
+
+                    if(dTime_o+480*4<dTime||dTime<dTime_o){
+                        judgeEnableBar();
+                        dTime_o = dTime;
+                    }
     
-                    keyon(soloSel, time);
+                    keyon(soloSel);
                     
-                    drawPRoll(soloSel, time);
+                    drawPRoll(soloSel);
                     
                     drawTrack();
     
@@ -1374,7 +1421,7 @@
             </script>
         </div>
         
-        <div class="nextplay" style="width: 300px;">
+        <div id="nextplay" style="width: 300px;">
             <!-- admax -->
             <div>
                 <script src="https://adm.shinobi.jp/s/5af888b336de00e2de6dc9502a134b5d"></script>

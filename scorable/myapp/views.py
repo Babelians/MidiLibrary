@@ -13,6 +13,7 @@ import os
 import copy #リストの参照無しコピー
 from django.db.models import Q
 import itertools #リストの１次元化 
+import math
 
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -417,8 +418,8 @@ def score_detail(request, pk):
                     hoge2 = f.read(int(f.read(1).hex(), 16)).hex()
             elif hoge == ('80'or'81'or'82'or'83'or'84'or'85'or'86'or'87'or'88'or'89'or'8a'or'8b'or'8c'or'8d'or'8e'or'8f'):
                 mid_t_note[i].append([])
-                mid_t_note[i][len(mid_t_note[i])-1].append(mid_t_dtime)
-                mid_t_note[i][len(mid_t_note[i])-1].append(int(f.read(1).hex(), 16))
+                mid_t_note[i][len(mid_t_note[i])-1].append(mid_t_dtime) #デルタタイム
+                mid_t_note[i][len(mid_t_note[i])-1].append(int(f.read(1).hex(), 16)) #音高
                 mid_t_note[i][len(mid_t_note[i])-1].append(f.read(1).hex())
                 mid_t_note[i][len(mid_t_note[i])-1][2] = 0
                 if mid_t_maxdt < mid_t_dtime:
@@ -445,18 +446,31 @@ def score_detail(request, pk):
 
     f.close()
 
-    #===============================================
-    #ミディの開始点と終端のデルタタイムを統合
-    #===============================================
+    #===============================================================================
+    #ミディの開始点と終端のデルタタイムの統合と小節で分割 小説は開始のデルタタイムで判定する
+    # note[トラック][小節][小節の開始デルタタイム 小節内の最大デルタタイム トラック情報]
+    #===============================================================================
     note = []
+    bar_split = 480*4
     for i in range(len(mid_t_note)):
         note.append([])
-        for j in range(len(mid_t_note[i])):
-            for k in range(j+1, len(mid_t_note[i])):
-                if mid_t_note[i][j][1] == mid_t_note[i][k][1] and mid_t_note[i][k][2] == 0:
-                    mid_t_note[i][j].append(mid_t_note[i][k][0])
-                    note[i].append(mid_t_note[i][j])
-                    del mid_t_note[i][k] 
+        bar_num = -1
+        list_num = -1
+        for j in range(len(mid_t_note[i])): #開始デルタタイムを探す
+            for k in range(j+1, len(mid_t_note[i])): #終端デルタタイムを探す
+                if mid_t_note[i][j][1] == mid_t_note[i][k][1] and mid_t_note[i][k][2] == 0: #音高が一致したら
+                    mid_t_note[i][j].append(mid_t_note[i][k][0]) #終端時間を追加
+                    if bar_split*(bar_num+1)<=mid_t_note[i][j][0]: #開始のデルタタイムが現在の小節の範囲を超えたら
+                        note[i].append([])
+                        bar_num = math.floor(mid_t_note[i][j][0]/(bar_split))
+                        list_num += 1
+                        note[i][list_num].append(bar_split*bar_num) #小節の始まりのデルタタイム
+                        note[i][list_num].append(mid_t_note[i][k][0]) #小節の終わりのデルタタイム
+                        note[i][list_num].append([]) #トラック情報
+                    note[i][list_num][2].append(mid_t_note[i][j])
+                    if note[i][list_num][1] < mid_t_note[i][k][0]:
+                        note[i][list_num][1] = mid_t_note[i][k][0]
+                    del mid_t_note[i][k]
                     break
 
     return render(request, 'myapp/score_detail.html', {
@@ -486,6 +500,7 @@ def score_detail(request, pk):
         'followMyCount': follow_mycount,
         'currency': currency,
         'tags':score_to_tagsName(score),
+        'barSplit':bar_split,
     })
 
 def like(request, pk): #いいね

@@ -6,8 +6,7 @@
             {% for score, tags in score_dict.items %}
             <div class="boxA" style="margin-left: 2%; display: flex;">
                 <a href="{% url 'score_detail' pk=score.pk %}">
-                    <div class="post" style="position: relative; overflow: hidden; width: 310px; height: 175px; display: flex; align-items: center; justify-content: center;">
-                        <img src="{{ score.score_art.url }}" style="height: 17500px; filter: blur(4px);"/>
+                    <div class="post" style="position: relative; overflow: hidden; width: 310px; height: 175px; display: flex; align-items: center; justify-content: center; background-color: var(--art-background-color);">
                         <img src="{{ score.score_art.url }}" style="height: 175px; position: absolute;"/>
                     </div>
                 </a>

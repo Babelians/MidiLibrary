@@ -70,8 +70,7 @@
             <audio id=audio>
                 <source src="{{ score.musicfile.url }}">
             </audio>
-            <div id="score" style=" width: 1150px; height: 650px; display: flex; justify-content: center; overflow: hidden;">
-                <img src="{{ score.score_art.url }}" style="height: 65000px; width: 100%; filter: brightness(50%);"/>
+            <div id="score" style=" width: 1150px; height: 650px; display: flex; justify-content: center; overflow: hidden; background-color: var(--art-background-color);">
                 <img id="score_art" src="{{ score.score_art.url }}" style="height: 650px; filter: brightness(50%);"/>
                 <canvas id="myCanvas" style="position: absolute;"></canvas>
             </div>
@@ -117,20 +116,20 @@
                     </div>
                 </footer>
                 <div class="comment">
-                    <div style="display: flex; height: 50px;">
-                        <div style="font-size: 15px; display: flex;">
-                            <i class="fas fa-play" style="color: gray; margin-top: 2px;"></i>
-                            <div style="margin-left: 5px;">{{ score.play_count }}</div>
+                    <div style="display: flex; justify-content: flex-end; align-items: center;">
+                        <div style="display: flex; align-items: center;">
+                            <i class="fas fa-play" style="color: gray; font-size: 18px;"></i>
+                            <div style="margin-left: 5px; display: flex;">{{ score.play_count }}</div>
                         </div>
                         {% if user.id %}
-                        <i class="far fa-heart" id="Like" style="width: 20px; height: 20px; font-size: 20px; color: white; cursor: pointer; margin-left: 10px;"></i>
+                        <i class="far fa-heart" id="Like" style="font-size: 22px; color: white; cursor: pointer; margin-left: 10px;"></i>
                         {% else %}
-                        <span style="margin-left: 10px;">Like</span>
+                        <div style="margin-left: 10px;">Like</div>
                         {% endif %}
-                        <div id="scoreHeartCount" style="margin-left: 5px;">{{ score.heart_count }}</div>
-                        <div style="margin: 0 0 0 auto;">
+                        <div id="scoreHeartCount" style="display: flex; margin-left: 5px;">{{ score.heart_count }}</div>
+                        <div style="display: flex; align-items: center;">
                             {% if not score.price or purchased %}
-                            <a href="{{ score.midifile.url }}"><div style="display: flex; align-items: center; justify-content: center; width: 120px; height: 40px; background-color: var(--main-color);">Download</div></a>
+                            <a href="{{ score.midifile.url }}"><i class="fas fa-download" style="font-size: 22px; margin-left: 10px;"></i><span style="margin-left: 5px;">DL</span></a>
                             {% endif %}
                             <!-- 購入ボタン・フォームの作成 -->
                             {% if user.is_authenticated and score.price and not purchased %}
@@ -1431,8 +1430,7 @@
             {% for post in recommend_byAlbam %}
             <div class="post" style="display: flex; margin-top: 10px;">
                 <a href="{% url 'score_detail' pk=post.pk %}">
-                    <div style="overflow: hidden; position: relative; width: 140px; height: 90px; display: flex; justify-content: center; align-items: center;">
-                        <img src="{{ post.score_art.url }}" style="height: 8000px; display: block;"/>
+                    <div style="overflow: hidden; position: relative; width: 140px; height: 90px; display: flex; justify-content: center; align-items: center; background-color: var(--art-background-color);">
                         <img src="{{ post.score_art.url }}" style="position: absolute; height: 90px; display: block;"/>
                     </div>
                 </a>
@@ -1455,8 +1453,7 @@
             {% else %}
             <div class="post" style="display: flex; margin-top: 10px;">
                 <a href="{% url 'score_detail' pk=post.pk %}">
-                    <div style="overflow: hidden; position: relative; width: 140px; height: 90px; display: flex; justify-content: center; align-items: center;">
-                        <img src="{{ post.score_art.url }}" style="height: 8000px; display: block;"/>
+                    <div style="overflow: hidden; position: relative; width: 140px; height: 90px; display: flex; justify-content: center; align-items: center; background-color: var(--art-background-color);">
                         <img src="{{ post.score_art.url }}" style="position: absolute; height: 90px; display: block;"/>
                     </div>
                 </a>

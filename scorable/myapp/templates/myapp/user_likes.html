@@ -20,7 +20,7 @@
         <div style="margin-left: 15px; width: 240px; overflow: hidden; max-height: 50px;"><a href="{% url 'score_detail' pk=post.song.pk %}">{{ post.song.song_name }}</a></div>
         <a href="{% url 'user_detail' pk=post.song.artist.pk %}" style="display: flex; align-items: center; margin-left: 40px;">
             <img src="{{ post.song.artist.face.url }}" style="width: 23px; height: 23px; border-radius: 50%;vertical-align: middle;"/>
-            <div style="font-size: 14px; width: 150px; overflow: hidden; margin-left: 10px; max-height: 40px;">{{ post.song.artist.username }}</div>
+            <div style="font-size: 14px; width: 300px; overflow: hidden; margin-left: 10px; max-height: 40px;">{{ post.song.artist.username }}</div>
         </a>
         {% if post.song.albam %}
         <div style="margin-left: 40px; width: 240px; overflow: hidden; max-height: 50px;"><a href="{% url 'albam_detail' pk=post.song.albam.id %}">{{ post.song.albam.albam_title }}</a></div>

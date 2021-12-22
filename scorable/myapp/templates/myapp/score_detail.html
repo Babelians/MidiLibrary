@@ -18,9 +18,8 @@
         #seekbox{
             z-index: 9991;
             width: 1150;
-            height: 20px;
+            height: 10px;
             background-color: rgb(216, 216, 216);
-            margin-top: 8px;
             user-select: none;
         }
         #seekbar{
@@ -57,8 +56,14 @@
         #nextPlay{
             margin-left: 20px;
         }
+        #inner-content{
+            margin-left: 20px;
+        }
         @media screen and (max-width: 1016px) {
             #nextPlay{
+                margin-left: 0px;
+            }
+            #inner-content{
                 margin-left: 0px;
             }
         }
@@ -70,20 +75,13 @@
             <audio id=audio>
                 <source src="{{ score.musicfile.url }}">
             </audio>
-            <div id="score" style=" width: 1150px; height: 650px; display: flex; justify-content: center; overflow: hidden; background-color: var(--art-background-color);">
-                <img id="score_art" src="{{ score.score_art.url }}" style="height: 650px; filter: brightness(50%);"/>
-                <canvas id="myCanvas" style="position: absolute;"></canvas>
-            </div>
 
-            <div style="margin-top: 15px;">
-                <div style="overflow: hidden; font-size: 20px; user-select: none;">
-                    {{ score.song_name }}
-                </div>
-                <div id=seekbox>
-                    <div id=seekbar></div>
-                </div>
-                <footer class="footer" style="width: 100%;">
-                    <div class="fcontainer" id="fcontainer" style="display: flex;">
+            <div id="scoreParent">
+                <footer class="footer" id="footer">
+                    <div id=seekbox>
+                        <div id=seekbar></div>
+                    </div>
+                    <div class="fcontainer" id="fcontainer" style="display: none;">
                         {% load static %}
                         <div class="passive">
                             <img id="pause" src="{% static 'img/pause.png' %}"></img>
@@ -105,16 +103,28 @@
                         <div id=volumebox>
                             <div id=volumebar></div>
                         </div>
-                    </div>
-                    <div class="time" style="display: flex; margin: 13px 0 0 auto;">
-                        <div id="current_time">
-        
-                        </div>
-                        <div id="total_time">
+                        <div class="time" style="display: flex; margin: 0 10px 0 auto;">
+                            <div id="current_time">
             
+                            </div>
+                            <div id="total_time">
+                
+                            </div>
                         </div>
                     </div>
                 </footer>
+    
+                <div id="score" style=" width: 1150px; height: 650px; display: flex; justify-content: center; overflow: hidden; background-color: var(--art-background-color);">
+                    <img id="score_art" src="{{ score.score_art.url }}" style="height: 650px; filter: brightness(50%);"/>
+                    <canvas id="myCanvas" style="position: absolute; z-index: 2;"></canvas>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <div style="overflow: hidden; font-size: 20px; user-select: none;">
+                    {{ score.song_name }}
+                </div>
+
                 <div class="comment">
                     <div style="display: flex; justify-content: flex-end; align-items: center;">
                         <div style="display: flex; align-items: center;">
@@ -381,7 +391,16 @@
                 var mouseOnScrollBar = false;
                 var mdy = 0;
                 let piaWid = canvas.width; //ピアノロールの横幅
+                let piaWidMinus = 0;
                 let piaHei = 125;
+
+                document.getElementById('scoreParent').addEventListener('mouseover', e=>{
+                    document.getElementById('fcontainer').style.display = "flex";
+                });
+
+                document.getElementById('scoreParent').addEventListener('mouseout', e=>{
+                    document.getElementById('fcontainer').style.display = "none";
+                });
     
                 canvas.addEventListener('pointerdown', e=>{
                     mouseDownFlg = true;
@@ -440,8 +459,9 @@
     
                 let trackColorSel = -1;
                 let colorY = -1;
-                let rectLar = 200;
-                let secRectLar = 50;
+                let rectLar = 110;
+                let secRectLar = 20;
+                let colorRecMinus = 20;
                 let newColor = new Array(3);
                 function colorChange(track){
                     let colorNum = 17;
@@ -453,7 +473,7 @@
                     color2 -= color2%colorDen;
                     newColor[2] = color2;
                     ctx.beginPath();
-                    ctx.rect(track_x[track]+20, colorY, rectLar, rectLar);
+                    ctx.rect(track_x[track]+colorRecMinus, colorY, rectLar, rectLar);
                     ctx.strokeStyle = "rgba(7, 7, 7, 1)";
                     ctx.stroke();
                     ctx.fillStyle = "rgba(7, 7, 7, 1)";
@@ -463,10 +483,10 @@
                     for(let i=0;i<colorNum;i++){
                         for(let j=0;j<colorNum;j++){
                             ctx.beginPath();
-                            ctx.rect(track_x[track]+20+i*smallRect, colorY+j*smallRect, smallRect, smallRect);
+                            ctx.rect(track_x[track]+colorRecMinus+i*smallRect, colorY+j*smallRect, smallRect, smallRect);
                             ctx.fillStyle = "rgba("+colorDen*i+", "+colorDen*j+", "+color2+", 1)";
                             ctx.fill();
-                            if(track_x[track]+20+i*smallRect<=mouseX&&mouseX<track_x[track]+20+i*smallRect+smallRect&&colorY+j*smallRect<=mouseY&&mouseY<colorY+j*smallRect+smallRect){
+                            if(track_x[track]+colorRecMinus+i*smallRect<=mouseX&&mouseX<track_x[track]+colorRecMinus+i*smallRect+smallRect&&colorY+j*smallRect<=mouseY&&mouseY<colorY+j*smallRect+smallRect){
                                 ctx.strokeStyle = "rgba(180, 180, 180, 1)";
                                 ctx.stroke();
                                 newColor[0] = colorDen*i;
@@ -482,7 +502,7 @@
     
                     //カラーの第三引数のボックス
                     ctx.beginPath();
-                    ctx.rect(track_x[track]+20+rectLar, colorY, secRectLar, rectLar);
+                    ctx.rect(track_x[track]+colorRecMinus+rectLar, colorY, secRectLar, rectLar);
                     ctx.strokeStyle = "rgba(0, 0, 0, 1)";
                     ctx.stroke();
                     ctx.fillStyle = "rgba(7, 7, 7, 1)";
@@ -491,7 +511,7 @@
     
                     for(let i=0;i<colorNum;i++){
                         ctx.beginPath();
-                        ctx.rect(track_x[track]+20+rectLar, colorY+i*smallRect, secRectLar, smallRect);
+                        ctx.rect(track_x[track]+colorRecMinus+rectLar, colorY+i*smallRect, secRectLar, smallRect);
                         ctx.fillStyle = "rgba("+0+", "+0+", "+colorDen*i+", 1)";
                         ctx.fill();
                         ctx.closePath();
@@ -1084,10 +1104,12 @@
                     document.getElementById("score").style.height = iContentWidth*650/1150;
                     canvas.width = retinaWidth;
                     canvas.height = retinaWidth*650/1150;
-                    piaWid = retinaWidth;
+                    piaWid = retinaWidth-piaWidMinus;
                     piaHei = piaWid*125/1150;
-                    document.getElementById("seekbar").style.width = iContentWidth*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
-                    document.getElementById("seekbox").style.width = iContentWidth;
+                    document.getElementById("seekbar").style.width = piaWid*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
+                    document.getElementById("seekbox").style.width = piaWid;
+                    document.getElementById("footer").style.width = piaWid;
+                    document.getElementById("footer").style.marginLeft = piaWidMinus;
                     whitekey = piaWid/52; //白鍵の横幅
                     blackkey = piaWid/88;
                     document.getElementById("score_art").style.height = iContentWidth*650/1150;
@@ -1145,10 +1167,10 @@
 
                     if(trackDisplayFlg&&tracks_x<0){
                         tracks_x += 10;
-                        piaWid -= 10;
+                        piaWidMinus += 10;
                     }else if(!trackDisplayFlg&&tracks_x>-150){
                         tracks_x -= 10;
-                        piaWid += 10;
+                        piaWidMinus -= 10;
                     }
     
                 }
@@ -1201,7 +1223,7 @@
                 function clickLoop(){
                     loopflg = !loopflg;
                     if(loopflg){
-                        document.getElementById("loopbtn").style="height: 70%; background-color: rgb(20, 20, 20);"; 
+                        document.getElementById("loopbtn").style="height: 70%; background-color: var(--main-color);"; 
                     }else{
                         document.getElementById("loopbtn").style="height: 70%;";
                     }

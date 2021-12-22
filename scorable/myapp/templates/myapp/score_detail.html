@@ -1092,6 +1092,7 @@
                 function resize(){
                     let contentWidth = document.getElementById("content").clientWidth;
                     let iContentWidth = document.getElementById("inner-content").clientWidth;
+                    let footerWidth = iContentWidth-piaWidMinus/window.devicePixelRatio;
                     let retinaWidth = iContentWidth*window.devicePixelRatio;
                     if(1016<contentWidth){
                         widthMinus = 1500 - contentWidth;
@@ -1106,10 +1107,10 @@
                     canvas.height = retinaWidth*650/1150;
                     piaWid = retinaWidth-piaWidMinus;
                     piaHei = piaWid*125/1150;
-                    document.getElementById("seekbar").style.width = piaWid*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
-                    document.getElementById("seekbox").style.width = piaWid;
-                    document.getElementById("footer").style.width = piaWid;
-                    document.getElementById("footer").style.marginLeft = piaWidMinus;
+                    document.getElementById("seekbar").style.width = footerWidth*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
+                    document.getElementById("seekbox").style.width = footerWidth;
+                    document.getElementById("footer").style.width = footerWidth;
+                    document.getElementById("footer").style.marginLeft = piaWidMinus/window.devicePixelRatio;
                     whitekey = piaWid/52; //白鍵の横幅
                     blackkey = piaWid/88;
                     document.getElementById("score_art").style.height = iContentWidth*650/1150;

@@ -1,10 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <style>
+        .index-content{
+            flex-wrap: wrap; 
+            margin: 0 auto; 
+            width: 1200px;
+        }
+        @media screen and (max-width: 1200px) {
+            .index-content{
+                flex-wrap: wrap; 
+                margin: 0 auto; 
+                width: 950px;
+            }
+        }
+        @media screen and (max-width: 950px) {
+            .index-content{
+                flex-wrap: wrap; 
+                margin: 0 auto; 
+                width: 600px;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .index-content{
+                flex-wrap: wrap; 
+                margin: 0 auto; 
+                width: 320px;
+            }
+        }
+    </style>
     <div class="content">
-        <div style="flex-wrap: wrap; margin: 0 auto; width: 1200px;">
+        <div class="index-content">
             <!-- admax -->
-            <div style="width: 729px; margin: 0 auto;">
+            <div style="width: 729px; margin: 0 auto;" class="head-add">
                 <script src="https://adm.shinobi.jp/s/73eb1cc90ab2bcea0845a5e3ef329f86"></script>
             </div>
             <!-- admax -->
@@ -63,7 +91,7 @@
                 {% endfor %}
 
                 <!-- admax -->
-                <div style="margin: 0 0 0 auto;">
+                <div style="margin: 0 0 0 25px;">
                     <script src="https://adm.shinobi.jp/s/ae42942d8cca6f932753e8531586248c"></script>
                 </div>
                 <!-- admax -->
@@ -73,7 +101,7 @@
 
             <div style="margin-top:80px;"></div>
 
-        {% for t, scores in scores_tag.items %}
+            {% for t, scores in scores_tag.items %}
             <div style="margin-left: 25px; font-size: 22px;"><a href="{% url 'search' %}?keyword={{t.name}}" style="color: var(--main-color);">#{{ t.name }}</a></div>
             <div style="display: flex; flex-wrap: wrap; margin-top: 16px;">
                 {% for post in scores %}
@@ -99,7 +127,7 @@
                 {% endfor %}
             </div>
             <div style="margin-top:70px;"></div>
-        {% endfor %} 
+            {% endfor %} 
         </div>
     </div>
 {% endblock %}

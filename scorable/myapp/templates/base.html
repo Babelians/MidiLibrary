@@ -5,7 +5,7 @@
 <html lang="ja">
     <head>
         <title>MidiLibrary</title>
-        <meta name="description" content="MidiLibrary(ミディライブラリー)は、Midiデータ作品の購入・販売が行えるサービスです。幅広いジャンルの音楽作品作品がユーザーによって投稿されています。">
+        <meta name="description" content="MidiLibrary(ミディライブラリー)は、Midiデータ作品の販売・購入が行えるサービスです。幅広いジャンルの音楽作品がユーザーによって投稿されています。">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel ="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
         <link rel="stylesheet" href="{% static 'css/mysite.css' %}">
@@ -62,21 +62,102 @@
             background-color: rgba(10, 10, 10, 1);
         }
 
+        #search{
+            width: 450px; 
+            height: 35px;
+        }
+        #upload{
+            cursor: pointer; 
+            margin: auto 0 auto 0;
+        }
+        #face{
+            cursor: pointer; 
+            margin-left: 30px;
+        }
+        #notice{
+            cursor: pointer; 
+            margin: auto 0 auto 0; 
+            margin-left: 30px;
+        }
+        #header-items{
+            display: flex;
+            width: 140px;
+        }
+        @media screen and (max-width: 850px) {
+            #search{
+                width: 250px;
+                height: 35px;
+            }
+            .head-add{
+                display: none;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            #search{
+                width: 200px;
+                height: 35px;
+            }
+            #header-items{
+                display: flex;
+                width: 120px;
+            }
+            #upload{
+                cursor: pointer; 
+            }
+            #face{
+                cursor: pointer; 
+                margin-left: 20px;
+            }
+            #notice{
+                cursor: pointer; 
+                margin: auto 0 auto 0; 
+                margin-left: 20px;
+            }
+            .head-add{
+                display: none;
+            }
+        }
+        @media screen and (max-width: 450px) {
+            #search{
+                width: 140px;
+                height: 35px;
+            }
+            #header-items{
+                display: flex;
+                width: 110px;
+            }
+            #upload{
+                cursor: pointer; 
+            }
+            #face{
+                cursor: pointer; 
+                margin-left: 14px;
+            }
+            #notice{
+                cursor: pointer; 
+                margin: auto 0 auto 0; 
+                margin-left: 14px;
+            }
+            .head-add{
+                display: none;
+            }
+        }
+
     </style>
     <body>
         <header class="header">
             <div class="container">
-                <div><a href="{% url 'index' %}">MidiLibrary-βテスト</a></div>
+                <div><a href="{% url 'index' %}">MidiLibrary</a></div>
                 <form method="GET" action="{% url 'search' %}" style="margin: auto 0 auto 0; margin: 0 auto;">
-                    <input type="text" name="keyword" placeholder=" 検索" value="{{keyword}}" required style="width: 450px; height: 35px;">
+                    <input type="text" id="search" name="keyword" placeholder=" 検索" value="{{keyword}}" required>
                     <!--<button type="submit" style="width: 65px; height: 35px">Search</button>-->
                 </form>
                 {% if user.id %}
-                <div style="display: flex; width: 140px;">
-                    <div id= "upload" onclick="clickUpload()" style="cursor: pointer; margin: auto 0 auto 0;"><img src="{% static 'img/upload.png' %}" style="width: 25px; height: 25px;"></div>
+                <div id="header-items">
+                    <div id= "upload" onclick="clickUpload()"><img src="{% static 'img/upload.png' %}" style="width: 25px; height: 25px;"></div>
                     <!--<a href="{% url 'user_detail' pk=user.pk %}" ></a>-->
-                    <div id = "notice" onclick="clickNotice()" style="cursor: pointer; margin: auto 0 auto 0; margin-left: 30px;"><img src="{% static 'img/notice.png' %}" style="width: 20px; height: 20px;"></div>
-                    <div id="face" onclick="clickFace()" style="cursor: pointer; margin-left: 30px;"><img src="{{ user.face.url }}" style="width: 35px; height: 35px; border-radius: 50%;"/></div>
+                    <div id = "notice" onclick="clickNotice()"><img src="{% static 'img/notice.png' %}" style="width: 20px; height: 20px;"></div>
+                    <div id="face" onclick="clickFace()"><img src="{{ user.face.url }}" style="width: 35px; height: 35px; border-radius: 50%;"/></div>
                 </div>
                 {% else %}
                 <div style="display: inline-flex;">

@@ -56,7 +56,7 @@ def index(request):
     tags = Tag.objects.order_by('-num')[:20]
     scores_tag = dict()
     for tag in tags:
-        scores_tag[tag] = Score.objects.filter(tags=tag).order_by('uploaded_at')[:12]
+        scores_tag[tag] = Score.objects.filter(tags=tag).order_by('-uploaded_at')[:12]
     return render(request, 'myapp/index.html', {'tags':tags, 'scores_tag':scores_tag, 'follow_scores':follow_scores, 'recommend_scores':recommend_scores,})
 
 def search(request):
@@ -72,7 +72,7 @@ def search(request):
             Q(song_name__icontains=key)|
             Q(artist_id__username__icontains=key)|
             Q(tags__name__icontains=key)
-            ).order_by('-play_count').distinct() #重複削除
+            ).order_by('-uploaded_at').distinct() #重複削除
     if flug == False:
         scores = []
     score_dict = dict()

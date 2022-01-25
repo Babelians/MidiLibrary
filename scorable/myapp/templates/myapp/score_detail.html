@@ -18,9 +18,11 @@
         #seekbox{
             z-index: 9991;
             width: 1150;
-            height: 10px;
+            height: 5px;
             background-color: rgba(216, 216, 216, 0.432);
             user-select: none;
+            position: relative;
+            margin-top: 15px;
         }
         #seekbar{
             z-index: 9993;
@@ -29,18 +31,35 @@
             background-color: var(--main-color);
             user-select: none;
         }
+        #seekcircle{
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 15px;
+            height: 15px;
+            z-index: 9994;
+            margin-top: 10px;
+            background-color: var(--main-color);
+        }
         #seekbox:hover{
             cursor: pointer;
         }
+        #volumecircle{
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 15px;
+            height: 15px;
+            z-index: 9994;
+            background-color: var(--main-color);
+        }
         #volumebox{
-            /*z-index: 9991;
-            position: fixed;*/
             width: 100px;
-            height: 10px;
+            height: 5px;
+            margin-top: 5px;
             background-color: rgba(255, 255, 255, 0.397);
         }
         #volumebar{
-            /*z-index: 9993;*/
             width: 50%;
             height: 100%;
             background-color: var(--main-color);
@@ -70,18 +89,19 @@
     </style>
 
     <div class="content" id="content" style="display: flex; flex-wrap: wrap;">
-        <div class="score-content" id="inner-content" style="width: 1150;">
-
+        <div class="score-content" id="inner-content" style="width: 1150; user-select: none;">
             <audio id=audio>
                 <source src="{{ score.musicfile.url }}">
             </audio>
-
+            <div id=seekparent style="position: absolute; height: 20px; align-items: center; z-index: 9999; top: 65px; cursor: pointer;">
+                <div id="seekcircle"></div>
+                <div id=seekbox>
+                    <div id=seekbar></div>
+                </div>
+            </div>
             <div id="scoreParent">
                 <footer class="footer" id="footer">
-                    <div id=seekbox>
-                        <div id=seekbar></div>
-                    </div>
-                    <div class="fcontainer" id="fcontainer" style="display: none;">
+                    <div class="fcontainer" id="fcontainer" style="display: none; margin-top: 5px;">
                         {% load static %}
                         <div class="passive">
                             <img id="pause" src="{% static 'img/pause.png' %}"></img>
@@ -100,10 +120,13 @@
                         <div>
                             <img src="{% static 'img/volume.png' %}" onclick="clickVolume()" style="height: 70%;" alt="volume" id="volumebtn">
                         </div>
-                        <div id=volumebox>
-                            <div id=volumebar></div>
+                        <div id="volumeparent" style="height: 20px; margin-top: 2px;">
+                            <div id="volumecircle"></div>
+                            <div id=volumebox>
+                                <div id=volumebar></div>
+                            </div>
                         </div>
-                        <div class="time" style="display: flex; margin: 0 10px 0 auto;">
+                        <div class="time" style="display: flex; margin: 0 10px 0 auto; user-select: none;">
                             <div id="current_time">
             
                             </div>
@@ -324,14 +347,27 @@
                     if(seekBarFlg){
                         if(0 < x-document.getElementById("seekbar").getBoundingClientRect().left &&
                                 x-document.getElementById("seekbar").getBoundingClientRect().left < document.getElementById("seekbox").clientWidth){
-                            document.getElementById("seekbar").style.width = x-document.getElementById("seekbox").getBoundingClientRect().left+"px";
+                            let width = x-document.getElementById("seekbox").getBoundingClientRect().left;
+                            let halfcircle = document.getElementById("seekcircle").clientWidth/2;
+                            if(width < halfcircle + 1){
+                                document.getElementById("seekbar").style.width = 0;
+                                document.getElementById("seekcircle").style.marginLeft = 0;
+                            }else{
+                                document.getElementById("seekbar").style.width = width;
+                                document.getElementById("seekcircle").style.marginLeft = width - halfcircle;
+                            }
                         }
                     }
                 }
 
                 function moveVolumebar(x){
                     if(volumeBarFlg){
-                        document.getElementById("volumebar").style.width = x-document.getElementById("volumebox").getBoundingClientRect().left+"px";
+                        let width = x-document.getElementById("volumebox").getBoundingClientRect().left;
+                        document.getElementById("volumebar").style.width = width;
+                        let circlewidth = width - document.getElementById("volumecircle").clientWidth/2
+                        if(circlewidth >= 0 &&  circlewidth <= document.getElementById("volumebox").clientWidth){
+                            document.getElementById("volumecircle").style.marginLeft = circlewidth;
+                        }
                         if(muteflg){
     
                         }else{
@@ -340,13 +376,13 @@
                     }
                 }
                 var seekBarFlg = false;
-                document.getElementById("seekbox").addEventListener("pointerdown", (e)=>{
+                document.getElementById("seekparent").addEventListener("pointerdown", (e)=>{
                     seekBarFlg = true;
                     moveSeekbar(e.clientX);
                 });
     
                 let volumeBarFlg = false;
-                document.getElementById("volumebox").addEventListener("pointerdown", (e)=>{
+                document.getElementById("volumeparent").addEventListener("pointerdown", (e)=>{
                     volumeBarFlg = true;
                     moveVolumebar(e.clientX);
                 });
@@ -1159,7 +1195,13 @@
                     changeTempo(time); //テンポ
     
                     if(!seekBarFlg){ //シークバー移動
-                        document.getElementById("seekbar").style.width = document.getElementById("seekbox").clientWidth*time/maxms + "px";  //style.widthだと取得できない
+                        document.getElementById("seekbar").style.width = document.getElementById("seekbox").clientWidth*time/maxms + "px";
+                        if(document.getElementById("seekbar").clientWidth < document.getElementById("seekcircle").clientWidth/2){
+                            document.getElementById("seekcircle").style.marginLeft = 0;
+                        }else{
+                            document.getElementById("seekcircle").style.marginLeft = (document.getElementById("seekbox").clientWidth*time/maxms
+                             - document.getElementById("seekcircle").clientWidth/2) + "px";
+                        }  //style.widthだと取得できない
                     }
     
                     if(maxms<=time){

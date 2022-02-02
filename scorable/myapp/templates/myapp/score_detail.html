@@ -16,7 +16,7 @@
         }
         
         #seekbox{
-            z-index: 9991;
+            z-index: 1;
             width: 1150;
             height: 5px;
             background-color: rgba(216, 216, 216, 0.432);
@@ -25,7 +25,7 @@
             margin-top: 15px;
         }
         #seekbar{
-            z-index: 9993;
+            z-index: 3;
             width: 0px;
             height: 100%;
             background-color: var(--main-color);
@@ -33,24 +33,22 @@
         }
         #seekcircle{
             position: absolute;
+            display: none;
             border-radius: 50%;
-            cursor: pointer;
             width: 15px;
             height: 15px;
-            z-index: 9994;
+            z-index: 4;
             margin-top: 10px;
             background-color: var(--main-color);
         }
-        #seekbox:hover{
-            cursor: pointer;
-        }
+        
         #volumecircle{
             position: absolute;
             border-radius: 50%;
-            cursor: pointer;
             width: 15px;
             height: 15px;
             z-index: 9994;
+            margin-left: 50px;
             background-color: var(--main-color);
         }
         #volumebox{
@@ -86,6 +84,14 @@
                 margin-left: 0px;
             }
         }
+        @media screen and (min-width: 1017px) {
+            #seekparent{
+                cursor: pointer;
+            }
+            #volumeparent{
+                cursor: pointer;
+            }
+        }
     </style>
 
     <div class="content" id="content" style="display: flex; flex-wrap: wrap;">
@@ -93,7 +99,7 @@
             <audio id=audio>
                 <source src="{{ score.musicfile.url }}">
             </audio>
-            <div id=seekparent style="position: absolute; height: 20px; align-items: center; z-index: 9999; top: 65px; cursor: pointer;">
+            <div id=seekparent style="position: absolute; height: 20px; align-items: center; z-index: 5; top: 65px;">
                 <div id="seekcircle"></div>
                 <div id=seekbox>
                     <div id=seekbar></div>
@@ -286,6 +292,9 @@
                 var mid_h_track = JSON.parse(document.getElementById('mid_h_track').textContent);
                 var trackname = JSON.parse(document.getElementById('trackname').textContent);
                 var barSplit = JSON.parse(document.getElementById('barSplit').textContent);
+
+                var canvas = document.getElementById("myCanvas");
+                var ctx = canvas.getContext("2d");
     
     
                 //maxdtTime = (tempo[0][1]/480)*(maxdt/1000);
@@ -375,50 +384,25 @@
                         }
                     }
                 }
-                var seekBarFlg = false;
-                document.getElementById("seekparent").addEventListener("pointerdown", (e)=>{
-                    seekBarFlg = true;
-                    moveSeekbar(e.clientX);
-                });
-    
+
+                let touch_event = window.ontouchstart;
+                let touch_points = navigator.maxTouchPoints;
+                let smartPhone = false;
+                
+                if( touch_event !== undefined && 0 < touch_points ) {
+                    // タッチ対応端末の処理が入る
+                    smartPhone = true;
+
+                } else {
+                    // タッチ非対応端末の処理が入る
+                    smartPhone = false;
+                }
+
+                let seekBarFlg = false;
                 let volumeBarFlg = false;
-                document.getElementById("volumeparent").addEventListener("pointerdown", (e)=>{
-                    volumeBarFlg = true;
-                    moveVolumebar(e.clientX);
-                });
-    
                 let my = 0;
-                document.addEventListener("pointermove", (e)=>{
-                    mdy = e.offsetY - my;
-                    my = e.offsetY;
-                    moveSeekbar(e.clientX);
-                    moveVolumebar(e.clientX);
-                    if(mouseTrackScrollDown){ 
-                        moveScrollBar(mdy, trackScrollBar, 0, canvas.height);
-                    }
-                    if(track_x[trackColorSel]+20+rectLar<=e.offsetX&&trackColorFlg&&mouseDownFlg){
-                        moveScrollBar(mdy, colorScrollBar, colorY, rectLar);
-                        c_rgba[trackColorSel][2] = newColor[2];
-                    }
-                    if(e.offsetX>trackWid-trackScrollBar.wid&&trackWid>e.offsetX){
-                        mouseOnScrollBar = true;
-                    }else{
-                        mouseOnScrollBar = false;
-                    }
-                });
-    
-                var canvas = document.getElementById("myCanvas");
-                var ctx = canvas.getContext("2d");
-    
                 let mouseX = -1;
                 let mouseY = -1;
-                canvas.addEventListener("pointermove", (e)=>{
-                    mouseX = e.offsetX;
-                    mouseY = e.offsetY;
-                });
-    
-                //note[track][note][0]デルタタイム, [1]音高, [2]ベロシティ, [3]終端のデルタタイム
-    
                 var time = -10;
                 var flag = true; //再生
                 let mouseDownFlg = false;
@@ -430,67 +414,6 @@
                 let piaWidMinus = 0;
                 let piaHei = 125;
 
-                document.getElementById('scoreParent').addEventListener('mouseover', e=>{
-                    document.getElementById('fcontainer').style.display = "flex";
-                });
-
-                document.getElementById('scoreParent').addEventListener('mouseout', e=>{
-                    document.getElementById('fcontainer').style.display = "none";
-                });
-    
-                canvas.addEventListener('pointerdown', e=>{
-                    mouseDownFlg = true;
-
-                    //トラックカラー選択画面が出ている時は反応しない
-                    if(!trackColorFlg){
-
-                        if(tracks_x+trackWid<e.offsetX){
-                            clickPlay();
-                        }
-
-                        //トラックソロセレクト
-                        for(let i=0;i<mid_h_track-1;i++){
-                            if(!(0<=trackColorSel&&colorY<=e.offsetY&&e.offsetY<=colorY+rectLar)&&trackColorSelWid+tracks_x<e.offsetX&&e.offsetX<trackWid+tracks_x-trackScrollBar.wid-10&&e.offsetY>=track_y[i]&&e.offsetY<track_y[i]+canvas.height/plateNum){ //-10はスクロールバーとトラックセレクトの大きい境界線
-                                soloSel[i] = !soloSel[i];
-                            }
-                        }
-
-                        //トラックのスクロールバー
-                        if(e.offsetX>=trackWid+tracks_x-trackScrollBar.wid&&e.offsetX<=trackWid+tracks_x&&(e.offsetY>trackScrollBar.y+trackScrollBar.hei||e.offsetY<trackScrollBar.y)){
-                            moveScrollBar(e.offsetY-(trackScrollBar.y+trackScrollBar.hei/2), trackScrollBar, 0, canvas.height);
-                        }
-
-                        if(e.offsetX<=trackWid+tracks_x){
-                            my = e.offsetY;
-                            mouseTrackDown = true;
-                            if(e.offsetX>=trackWid+tracks_x-trackScrollBar.wid&&e.offsetX<=trackWid+tracks_x&&e.offsetY<trackScrollBar.y+trackScrollBar.hei&&e.offsetY>trackScrollBar.y){
-                            mouseTrackScrollDown = true;
-                            }
-                        }
-                    }
-    
-                    //トラックカラー選択
-                    if(track_x[trackColorSel]+20<=e.offsetX&&e.offsetX<track_x[trackColorSel]+20+rectLar+secRectLar&&colorY<=e.offsetY&&e.offsetY<colorY+rectLar){
-                        trackColorFlg = true;
-                        if(track_x[trackColorSel]+20+rectLar<=e.offsetX){
-                            moveScrollBar(e.offsetY-colorScrollBar.y, colorScrollBar, colorY, rectLar);
-                        }else{
-                            c_rgba[trackColorSel][0] = newColor[0];
-                            c_rgba[trackColorSel][1] = newColor[1];
-                            c_rgba[trackColorSel][2] = newColor[2];
-                        }
-                    }else{
-                        trackColorFlg = false;
-                        trackColorSel = -1;
-                    }
-                    for(let i=0;i<mid_h_track-1;i++){
-                        if(trackColorSelWid+tracks_x>=e.offsetX&&e.offsetY>=track_y[i]&&e.offsetY<track_y[i]+canvas.height/plateNum){
-                            trackColorSel = i;
-                            trackColorFlg = true;
-                            colorScrollBar.y = (canvas.height-rectLar)*track_y[i]/canvas.height+c_rgba[i][2]/255*rectLar;
-                        }
-                    }
-                });
                 let trackColorFlg = false;
     
                 let trackColorSel = -1;
@@ -499,6 +422,208 @@
                 let secRectLar = 20;
                 let colorRecMinus = 20;
                 let newColor = new Array(3);
+                let displayItemTimer = 0;
+                if(!smartPhone){
+                    document.getElementById("seekparent").addEventListener("mousedown", (e)=>{
+                        seekBarFlg = true;
+                        moveSeekbar(e.clientX);
+                    });
+        
+                    document.getElementById("volumeparent").addEventListener("mousedown", (e)=>{
+                        volumeBarFlg = true;
+                        moveVolumebar(e.clientX);
+                    });
+        
+                    document.addEventListener("mousemove", (e)=>{
+                        mdy = e.offsetY - my;
+                        my = e.offsetY;
+                        moveSeekbar(e.clientX);
+                        moveVolumebar(e.clientX);
+                        if(mouseTrackScrollDown){ 
+                            moveScrollBar(mdy, trackScrollBar, 0, canvas.height);
+                        }
+                        if(track_x[trackColorSel]+20+rectLar<=e.offsetX&&trackColorFlg&&mouseDownFlg){
+                            moveScrollBar(mdy, colorScrollBar, colorY, rectLar);
+                            c_rgba[trackColorSel][2] = newColor[2];
+                        }
+                        if(e.offsetX>trackWid-trackScrollBar.wid&&trackWid>e.offsetX){
+                            mouseOnScrollBar = true;
+                        }else{
+                            mouseOnScrollBar = false;
+                        }
+                    });
+
+                    canvas.addEventListener("mousemove", (e)=>{
+                        mouseX = e.offsetX;
+                        mouseY = e.offsetY;
+                    });
+
+                    document.getElementById('scoreParent').addEventListener('mouseover', e=>{
+                        displayItem(true);
+                    });
+
+                    document.getElementById('seekparent').addEventListener('mouseover', e=>{
+                        displayItem(true);
+                    });
+
+                    document.getElementById('scoreParent').addEventListener('mouseout', e=>{
+                        displayItem(false);
+                    });
+
+                    document.getElementById('seekparent').addEventListener('mouseout', e=>{
+                        displayItem(false);
+                    });
+
+                    canvas.addEventListener('mousedown', e=>{
+                        mouseDownFlg = true;
+
+                        //トラックカラー選択画面が出ている時は反応しない
+                        if(!trackColorFlg){
+
+                            if(tracks_x+trackWid<e.offsetX){
+                                clickPlay();
+                            }
+
+                            //トラックソロセレクト
+                            for(let i=0;i<mid_h_track-1;i++){
+                                if(!(0<=trackColorSel&&colorY<=e.offsetY&&e.offsetY<=colorY+rectLar)&&trackColorSelWid+tracks_x<e.offsetX&&e.offsetX<trackWid+tracks_x-trackScrollBar.wid-10&&e.offsetY>=track_y[i]&&e.offsetY<track_y[i]+canvas.height/plateNum){ //-10はスクロールバーとトラックセレクトの大きい境界線
+                                    soloSel[i] = !soloSel[i];
+                                }
+                            }
+
+                            //トラックのスクロールバー
+                            if(e.offsetX>=trackWid+tracks_x-trackScrollBar.wid&&e.offsetX<=trackWid+tracks_x&&(e.offsetY>trackScrollBar.y+trackScrollBar.hei||e.offsetY<trackScrollBar.y)){
+                                moveScrollBar(e.offsetY-(trackScrollBar.y+trackScrollBar.hei/2), trackScrollBar, 0, canvas.height);
+                            }
+
+                            if(e.offsetX<=trackWid+tracks_x){
+                                my = e.offsetY;
+                                mouseTrackDown = true;
+                                if(e.offsetX>=trackWid+tracks_x-trackScrollBar.wid&&e.offsetX<=trackWid+tracks_x&&e.offsetY<trackScrollBar.y+trackScrollBar.hei&&e.offsetY>trackScrollBar.y){
+                                mouseTrackScrollDown = true;
+                                }
+                            }
+                        }
+        
+                        //トラックカラー選択
+                        if(track_x[trackColorSel]+20<=e.offsetX&&e.offsetX<track_x[trackColorSel]+20+rectLar+secRectLar&&colorY<=e.offsetY&&e.offsetY<colorY+rectLar){
+                            trackColorFlg = true;
+                            if(track_x[trackColorSel]+20+rectLar<=e.offsetX){
+                                moveScrollBar(e.offsetY-colorScrollBar.y, colorScrollBar, colorY, rectLar);
+                            }else{
+                                c_rgba[trackColorSel][0] = newColor[0];
+                                c_rgba[trackColorSel][1] = newColor[1];
+                                c_rgba[trackColorSel][2] = newColor[2];
+                            }
+                        }else{
+                            trackColorFlg = false;
+                            trackColorSel = -1;
+                        }
+                        for(let i=0;i<mid_h_track-1;i++){
+                            if(trackColorSelWid+tracks_x>=e.offsetX&&e.offsetY>=track_y[i]&&e.offsetY<track_y[i]+canvas.height/plateNum){
+                                trackColorSel = i;
+                                trackColorFlg = true;
+                                colorScrollBar.y = (canvas.height-rectLar)*track_y[i]/canvas.height+c_rgba[i][2]/255*rectLar;
+                            }
+                        }
+                    });
+
+                    document.addEventListener('mouseup', e=>{
+                        mouseDownFlg = false;
+                        mouseTrackDown = false;
+                        mouseTrackScrollDown = false;
+                        volumeBarFlg = false;
+                        mdy = 0;
+                        if(seekBarFlg){
+                            maxms = music.duration*1000;
+                            time = maxms*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
+                            music.currentTime = music.duration*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
+                            seekBarFlg = false;
+                        }
+                    });
+        
+                    var keyUp = false;
+                    var keyDown = false;
+                    var keyRight = false;
+                    var keyLeft = false;
+                    document.addEventListener('keydown', e=>{
+                        if(e.keyCode==38){keyUp=true;}
+                        if(e.keyCode==40){keyDown=true;}
+                        if(e.keyCode==39){keyRight=true;}
+                        if(e.keyCode==37){keyLeft=true;}
+                    });
+        
+                    document.addEventListener('keyup', e=>{
+                        if(e.keyCode==38){keyUp=false;}
+                        if(e.keyCode==40){keyDown=false;}
+                        if(e.keyCode==39){keyRight=false;}
+                        if(e.keyCode==37){keyLeft=false;}
+                    });
+                }else{ //スマホの時
+                    document.getElementById("seekparent").addEventListener("touchstart", (e)=>{
+                        seekBarFlg = true;
+                        moveSeekbar(e.changedTouches[0].pageX);
+                        displayItem(true);
+                    });
+
+                    document.getElementById("seekparent").addEventListener("touchend", (e)=>{
+                        displayItemTimer = 10;
+                    });
+
+                    document.getElementById("volumeparent").addEventListener("touchstart", (e)=>{
+                        volumeBarFlg = true;
+                        moveVolumebar(e.changedTouches[0].pageX);
+                    });
+
+                    document.addEventListener("touchmove", (e)=>{
+                        mdy = e.changedTouches[0].pageY - my;
+                        my = e.changedTouches[0].pageY;
+                        moveSeekbar(e.changedTouches[0].pageX);
+                        moveVolumebar(e.changedTouches[0].pageX);
+                        if(mouseTrackScrollDown){ 
+                            moveScrollBar(mdy, trackScrollBar, 0, canvas.height);
+                        }
+                        if(track_x[trackColorSel]+20+rectLar<=e.changedTouches[0].pageX&&trackColorFlg&&mouseDownFlg){
+                            moveScrollBar(mdy, colorScrollBar, colorY, rectLar);
+                            c_rgba[trackColorSel][2] = newColor[2];
+                        }
+                        if(e.changedTouches[0].pageX>trackWid-trackScrollBar.wid&&trackWid>e.changedTouches[0].pageX){
+                            mouseOnScrollBar = true;
+                        }else{
+                            mouseOnScrollBar = false;
+                        }
+                    });
+
+                    document.addEventListener('touchend', e=>{
+                        mouseDownFlg = false;
+                        mouseTrackDown = false;
+                        mouseTrackScrollDown = false;
+                        volumeBarFlg = false;
+                        mdy = 0;
+                        if(seekBarFlg){
+                            maxms = music.duration*1000;
+                            time = maxms*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
+                            music.currentTime = music.duration*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
+                            seekBarFlg = false;
+                        }
+                    });
+
+                    canvas.addEventListener("touchmove", (e)=>{
+                        mouseX = e.changedTouches[0].pageX;
+                        mouseY = e.changedTouches[0].pageY;
+                    });
+
+                    canvas.addEventListener("touchstart", (e)=>{
+                        displayItem(true);
+                    });
+
+                    canvas.addEventListener("touchend", (e)=>{
+                        displayItemTimer = 10;
+                    });
+                }
+    
+                //note[track][note][0]デルタタイム, [1]音高, [2]ベロシティ, [3]終端のデルタタイム
+
                 function colorChange(track){
                     let colorNum = 17;
                     let colorDen = 255/colorNum;
@@ -575,52 +700,6 @@
                         my = e.offsetY;
                     }
                 });*/
-    
-                document.addEventListener('pointerup', e=>{
-                    mouseDownFlg = false;
-                    mouseTrackDown = false;
-                    mouseTrackScrollDown = false;
-                    volumeBarFlg = false;
-                    mdy = 0;
-                    if(seekBarFlg){
-                        maxms = music.duration*1000;
-                        time = maxms*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
-                        music.currentTime = music.duration*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
-                        seekBarFlg = false;
-                    }
-                });
-
-                document.addEventListener('pointercancel', e=>{
-                    mouseDownFlg = false;
-                    mouseTrackDown = false;
-                    mouseTrackScrollDown = false;
-                    volumeBarFlg = false;
-                    mdy = 0;
-                    if(seekBarFlg){
-                        maxms = music.duration*1000;
-                        time = maxms*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
-                        music.currentTime = music.duration*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
-                        seekBarFlg = false;
-                    }
-                });
-    
-                var keyUp = false;
-                var keyDown = false;
-                var keyRight = false;
-                var keyLeft = false;
-                document.addEventListener('keydown', e=>{
-                    if(e.keyCode==38){keyUp=true;}
-                    if(e.keyCode==40){keyDown=true;}
-                    if(e.keyCode==39){keyRight=true;}
-                    if(e.keyCode==37){keyLeft=true;}
-                });
-    
-                document.addEventListener('keyup', e=>{
-                    if(e.keyCode==38){keyUp=false;}
-                    if(e.keyCode==40){keyDown=false;}
-                    if(e.keyCode==39){keyRight=false;}
-                    if(e.keyCode==37){keyLeft=false;}
-                });
     
                 function hexToText(hexx){
                     let text = "";
@@ -1153,6 +1232,17 @@
                     canvas.style.width = iContentWidth;
                     canvas.style.height = iContentWidth*650/1150;
                 }
+
+                function displayItem(iflug){
+                    if(iflug){
+                        displayItemTimer = 0;
+                        document.getElementById('fcontainer').style.display = "flex";
+                        document.getElementById('seekcircle').style.display = "flex";
+                    }else{
+                        document.getElementById('fcontainer').style.display = "none";
+                        document.getElementById('seekcircle').style.display = "none";
+                    }
+                }
     
                 //線画
                 let interv = 20;
@@ -1199,8 +1289,8 @@
                         if(document.getElementById("seekbar").clientWidth < document.getElementById("seekcircle").clientWidth/2){
                             document.getElementById("seekcircle").style.marginLeft = 0;
                         }else{
-                            document.getElementById("seekcircle").style.marginLeft = (document.getElementById("seekbox").clientWidth*time/maxms
-                             - document.getElementById("seekcircle").clientWidth/2) + "px";
+                            document.getElementById("seekcircle").style.marginLeft
+                             = (document.getElementById("seekbox").clientWidth*time/maxms - document.getElementById("seekcircle").clientWidth/2) + "px";
                         }  //style.widthだと取得できない
                     }
     
@@ -1214,6 +1304,14 @@
                     }else if(!trackDisplayFlg&&tracks_x>-150){
                         tracks_x -= 10;
                         piaWidMinus -= 10;
+                    }
+
+                    if(smartPhone && displayItemTimer > 0 && !seekBarFlg && !volumeBarFlg){
+                        displayItemTimer -= 1/dt;
+                        if(displayItemTimer <= 0)
+                        {
+                            displayItem(false);
+                        }
                     }
     
                 }

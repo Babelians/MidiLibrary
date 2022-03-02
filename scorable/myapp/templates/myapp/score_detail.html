@@ -99,7 +99,7 @@
             <audio id=audio>
                 <source src="{{ score.musicfile.url }}">
             </audio>
-            <div id=seekparent style="position: absolute; height: 20px; align-items: center; z-index: 5; top: 65px;">
+            <div id=seekparent style="position: absolute; height: 27px; align-items: center; z-index: 5; top: 65px;">
                 <div id="seekcircle"></div>
                 <div id=seekbox>
                     <div id=seekbar></div>
@@ -326,11 +326,6 @@
                 let currentTime = document.createTextNode("0:00/");
                 currentTime.id = "current_time_text";
                 document.getElementById("current_time").appendChild(currentTime);
-    
-                /*let t = Math.floor(maxms/1000/60);
-                let t2 = zeroPadding(Math.floor(maxms/1000%60), 2);
-                let maxTime = document.createTextNode(t+":"+t2);
-                document.getElementById("total_time").appendChild(maxTime);*/
     
                 music.addEventListener('loadedmetadata', function() {
                     //midiデータと楽曲の総時間は一致するとは限らない
@@ -693,14 +688,6 @@
                     y:-1
                 };
     
-    
-                /*canvas.addEventListener('mousemove', e=>{
-                    if(mouseTrackDown){
-                        mdy = e.offsetY - my;
-                        my = e.offsetY;
-                    }
-                });*/
-    
                 function hexToText(hexx){
                     let text = "";
                     for(let i=0;i<hexx.length/2;i++){
@@ -979,11 +966,6 @@
                     if(plateNum<mid_h_track){
                         //バーボックス
                         trackScrollBar.wid = 10;
-                        /*ctx.beginPath();
-                        ctx.rect(trackWid-trackScrollBar.wid, 0, trackScrollBar.wid, canvas.height);
-                        ctx.fillStyle = "rgba(40, 20, 40, 1)";
-                        ctx.fill();
-                        ctx.closePath();*/
     
                         //バー
                         ctx.beginPath();
@@ -1222,10 +1204,12 @@
                     canvas.height = retinaWidth*650/1150;
                     piaWid = retinaWidth-piaWidMinus;
                     piaHei = piaWid*125/1150;
+                    trackScrollBar.hei = canvas.height*plateNum/(mid_h_track-1);
                     document.getElementById("seekbar").style.width = footerWidth*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
                     document.getElementById("seekbox").style.width = footerWidth;
                     document.getElementById("footer").style.width = footerWidth;
                     document.getElementById("footer").style.marginLeft = piaWidMinus/window.devicePixelRatio;
+                    document.getElementById("seekparent").style.marginLeft = piaWidMinus/window.devicePixelRatio;
                     whitekey = piaWid/52; //白鍵の横幅
                     blackkey = piaWid/88;
                     document.getElementById("score_art").style.height = iContentWidth*650/1150;
@@ -1237,7 +1221,7 @@
                     if(iflug){
                         displayItemTimer = 0;
                         document.getElementById('fcontainer').style.display = "flex";
-                        document.getElementById('seekcircle').style.display = "flex";
+                        document.getElementById('seekcircle').style.display = "block";
                     }else{
                         document.getElementById('fcontainer').style.display = "none";
                         document.getElementById('seekcircle').style.display = "none";
@@ -1307,12 +1291,13 @@
                     }
 
                     if(smartPhone && displayItemTimer > 0 && !seekBarFlg && !volumeBarFlg){
-                        displayItemTimer -= 1/dt;
-                        if(displayItemTimer <= 0)
+                        displayItemTimer -= 1/interv;
+                        if(displayItemTimer <= 0 && !flag)
                         {
                             displayItem(false);
                         }
                     }
+                    console.log(displayItemTimer);
     
                 }
                 setInterval(draw, interv);
@@ -1331,7 +1316,7 @@
                         }
                         music.play();
                         document.getElementById("playbtn").src=document.getElementById("pause").src;
-                        document.getElementById("playbtn").style="height: 70%;";  
+                        document.getElementById("playbtn").style="height: 70%;";
                     }else{
                         dt = 0;
                         music.pause();

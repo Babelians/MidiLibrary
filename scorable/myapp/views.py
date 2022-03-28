@@ -610,8 +610,8 @@ def score_edit(request, pk):
         return render(request, 'myapp/none.html',{})
 
 def deleteScore(score):
-    """face_path = os.path.join(MEDIA_ROOT, str(my.face))
-    art_path = os.path.join(MEDIA_ROOT, str(score.score_art))"""
+    face_path = os.path.join(MEDIA_ROOT, str(score.artist.face))
+    art_path = os.path.join(MEDIA_ROOT, str(score.score_art))
     audio_path = os.path.join(MEDIA_ROOT, str(score.musicfile))
     midi_path = os.path.join(MEDIA_ROOT, str(score.midifile))
     
@@ -623,8 +623,7 @@ def deleteScore(score):
         albam_art_path = []
     os.remove(audio_path)
     os.remove(midi_path)
-    """if not art_path == face_path and not art_path == albam_art_path:
-        os.remove(art_path)"""
+
     score.delete()
     if albam:
         albam_scores = Score.objects.filter(albam=albam).order_by('albam_num')
@@ -633,6 +632,9 @@ def deleteScore(score):
             aScore.albam_num = i
             aScore.save()
             i += 1
+    else:
+        if not art_path == face_path:
+            os.remove(art_path)
 
 
 def deleteAlbam(albam):

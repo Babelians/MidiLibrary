@@ -1095,7 +1095,7 @@
     
                 let whitekey = piaWid/52; //白鍵の横幅
                 let blackkey = piaWid/88; //黒鍵の横幅
-                let midiSpeed = 6; //流れる速さ
+                let midiSpeed = 7; //流れる速さ
                 let midiSprit = 10/midiSpeed; //midiとmidiの間
                 function drawPRoll(track){
                     for(let j=0;j<mid_h_track-1;j++){
@@ -1292,7 +1292,7 @@
 
                     if(smartPhone && displayItemTimer > 0 && !seekBarFlg && !volumeBarFlg){
                         displayItemTimer -= 1/interv;
-                        if(displayItemTimer <= 0 && !flag)
+                        if(displayItemTimer <= 0 && flag)
                         {
                             displayItem(false);
                         }
@@ -1314,6 +1314,7 @@
                         if(maxms<=time){
                             time = 0;
                         }
+                        displayItemTimer = 5;
                         music.play();
                         document.getElementById("playbtn").src=document.getElementById("pause").src;
                         document.getElementById("playbtn").style="height: 70%;";

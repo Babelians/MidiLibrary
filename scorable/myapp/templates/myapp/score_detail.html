@@ -33,20 +33,20 @@
         }
         #seekcircle{
             position: absolute;
-            display: none;
+            display: block;
             border-radius: 50%;
-            width: 15px;
-            height: 15px;
+            width: 14px;
+            height: 14px;
             z-index: 4;
             margin-top: 10px;
             background-color: var(--main-color);
         }
         
-        #volumecircle{
+        #volumecircle {
             position: absolute;
             border-radius: 50%;
-            width: 15px;
-            height: 15px;
+            width: 14px;
+            height: 14px;
             z-index: 9994;
             margin-left: 50px;
             background-color: var(--main-color);
@@ -107,7 +107,7 @@
             </div>
             <div id="scoreParent">
                 <footer class="footer" id="footer">
-                    <div class="fcontainer" id="fcontainer" style="display: none; margin-top: 5px;">
+                    <div class="fcontainer" id="fcontainer" style="visibility: hidden; margin-top: 5px; display: flex;">
                         {% load static %}
                         <div class="passive">
                             <img id="pause" src="{% static 'img/pause.png' %}"></img>
@@ -132,6 +132,7 @@
                                 <div id=volumebar></div>
                             </div>
                         </div>
+
                         <div class="time" style="display: flex; margin: 0 10px 0 auto; user-select: none;">
                             <div id="current_time">
             
@@ -152,6 +153,9 @@
             <div style="margin-top: 15px;">
                 <div style="overflow: hidden; font-size: 20px; user-select: none;">
                     {{ score.song_name }}
+                    {% if score.price and not purchased %}
+                    <span style="color: red;">・プレビュー</span>
+                    {% endif %}
                 </div>
 
                 <div class="comment">
@@ -254,13 +258,21 @@
                     
                     <div style="width: 100%;">
                         {% for post in posts %}
-                        <div class="comment_box" style="margin-top: 15px; display: flex;">
+                        <div class="comment_box" id="comment_box_{{ post.id }}" style="margin-top: 15px; display: flex;" daata-commentId = "{{ post.id }}">
                             <div style="margin-top: 1px;">
                                 <a class="face" href="{% url 'user_detail' pk=post.owner_id %}" ><img src="{{ post.owner.face.url }}" style="width: 35px; height: 35px; border-radius: 50%;"/></a>
                             </div>
                             <div class="name_and_comment">
-                                <span style="font-size: 14px;">{{ post.owner.username }}</span>
-                                <span style="color: rgb(122, 122, 122); font-size: 14px">{{ post.uploaded_at }}</span>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="font-size: 14px;">{{ post.owner.username }}</div>
+                                    <div style="color: rgb(122, 122, 122); font-size: 14px;">・{{ post.uploaded_at }}</div>
+                                    {% if user.id == post.owner.id or user.id == score.artist.id %}
+                                    <div name="DeleteC" data-id="{{ post.id }}" 
+                                        style="border: 1px solid red; width: 50px; margin-left: 10px; 
+                                        text-align: center; display: flexbox; color: red; cursor: pointer;">削除
+                                    </div>
+                                    {% endif %}
+                                </div>
                                 <div style="font-size: 15px;">{{ post.content|linebreaksbr|urlize }}</div>
                                 <div style="display: flex; margin-top: 5px;">
                                     {% if user.id %}
@@ -283,7 +295,9 @@
             {{ mid_h_track|json_script:"mid_h_track" }}
             {{ trackname|json_script:"trackname" }}
             {{ barSplit|json_script:"barSplit" }}
-            
+            {{ purchased|json_script:"purchased" }}
+            {{ preview|json_script:"preview" }}
+
             <script>
                 var tempo = JSON.parse(document.getElementById('tempo').textContent);
                 var note = JSON.parse(document.getElementById('note').textContent);
@@ -292,6 +306,8 @@
                 var mid_h_track = JSON.parse(document.getElementById('mid_h_track').textContent);
                 var trackname = JSON.parse(document.getElementById('trackname').textContent);
                 var barSplit = JSON.parse(document.getElementById('barSplit').textContent);
+                var purchased = JSON.parse(document.getElementById('purchased').textContent);
+                var preview = JSON.parse(document.getElementById('preview').textContent);
 
                 var canvas = document.getElementById("myCanvas");
                 var ctx = canvas.getContext("2d");
@@ -309,43 +325,41 @@
                 function zeroPadding(num,length){
                    return ('0000000000' + num).slice(-length);
                 }
-    
-                //midiデータと楽曲の総時間は一致するとは限らない
-                if(music.duration){
-                maxms = music.duration*1000;
-                }else{
-                    for(let i=0;i<tempo.length;i++){
-                        if(i+1==tempo.length){ //最後のテンポチェンジの時
-                            maxms += (maxdt-tempo[i][0])*tempo[i][1]/(480*1000); 
+
+                function setMaxMs()
+                {
+                    if(preview)
+                    {
+                        maxms = preview;
+                        document.getElementById("seekbar").style.backgroundColor = "red";
+                        document.getElementById("seekcircle").style.backgroundColor = "red";
+                    }
+                    else
+                    {
+                        //midiデータと楽曲の総時間は一致するとは限らない
+                        if(music.duration){
+                            maxms = music.duration*1000;
                         }else{
-                            maxms += tempo[i][1]/(480*1000)*(tempo[i+1][0]-tempo[i][0]); //tempo[i][1]/(480*1000)で1デルタタイム当たりのms
+                            for(let i=0;i<tempo.length;i++){
+                                if(i+1==tempo.length){ //最後のテンポチェンジの時
+                                    maxms += (maxdt-tempo[i][0])*tempo[i][1]/(480*1000); 
+                                }else{
+                                    maxms += tempo[i][1]/(480*1000)*(tempo[i+1][0]-tempo[i][0]); //tempo[i][1]/(480*1000)で1デルタタイム当たりのms
+                                }
+                            }
                         }
                     }
                 }
+
+                setMaxMs();
     
                 let currentTime = document.createTextNode("0:00/");
                 currentTime.id = "current_time_text";
                 document.getElementById("current_time").appendChild(currentTime);
-    
-                music.addEventListener('loadedmetadata', function() {
-                    //midiデータと楽曲の総時間は一致するとは限らない
-                    if(music.duration){
-                        maxms = music.duration*1000;
-                    }else{
-                        for(let i=0;i<tempo.length;i++){
-                            if(i+1==tempo.length){ //最後のテンポチェンジの時
-                                maxms += (maxdt-tempo[i][0])*tempo[i][1]/(480*1000); 
-                            }else{
-                                maxms += tempo[i][1]/(480*1000)*(tempo[i+1][0]-tempo[i][0]); //tempo[i][1]/(480*1000)で1デルタタイム当たりのms
-                            }
-                        }
-                    }
-    
-                    let t = Math.floor(maxms/1000/60);
-                    let t2 = zeroPadding(Math.floor(maxms/1000%60), 2);
-                    let maxTime = document.createTextNode(t+":"+t2);
-                    document.getElementById("total_time").appendChild(maxTime);
-                });
+                let t = Math.floor(maxms/1000/60);
+                let t2 = zeroPadding(Math.floor(maxms/1000%60), 2);
+                let maxTime = document.createTextNode(t+":"+t2);
+                document.getElementById("total_time").appendChild(maxTime);
 
                 function moveSeekbar(x){
                     if(seekBarFlg){
@@ -364,6 +378,15 @@
                     }
                 }
 
+                function setVolume()
+                {
+                    if(muteflg){
+    
+                    }else{
+                        music.volume = document.getElementById("volumebar").clientWidth/document.getElementById("volumebox").clientWidth;
+                    }
+                }
+
                 function moveVolumebar(x){
                     if(volumeBarFlg){
                         let width = x-document.getElementById("volumebox").getBoundingClientRect().left;
@@ -372,11 +395,7 @@
                         if(circlewidth >= 0 &&  circlewidth <= document.getElementById("volumebox").clientWidth){
                             document.getElementById("volumecircle").style.marginLeft = circlewidth;
                         }
-                        if(muteflg){
-    
-                        }else{
-                            music.volume = document.getElementById("volumebar").clientWidth/document.getElementById("volumebox").clientWidth;
-                        }
+                        setVolume();
                     }
                 }
 
@@ -418,7 +437,8 @@
                 let colorRecMinus = 20;
                 let newColor = new Array(3);
                 let displayItemTimer = 0;
-                if(!smartPhone){
+                if(!smartPhone)
+                {
                     document.getElementById("seekparent").addEventListener("mousedown", (e)=>{
                         seekBarFlg = true;
                         moveSeekbar(e.clientX);
@@ -530,9 +550,9 @@
                         volumeBarFlg = false;
                         mdy = 0;
                         if(seekBarFlg){
-                            maxms = music.duration*1000;
+                            setMaxMs();
                             time = maxms*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
-                            music.currentTime = music.duration*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
+                            music.currentTime = (maxms/1000)*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
                             seekBarFlg = false;
                         }
                     });
@@ -596,9 +616,9 @@
                         volumeBarFlg = false;
                         mdy = 0;
                         if(seekBarFlg){
-                            maxms = music.duration*1000;
+                            setMaxMs();
                             time = maxms*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth;
-                            music.currentTime = music.duration*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
+                            music.currentTime = (maxms/1000)*document.getElementById("seekbar").clientWidth/document.getElementById("seekbox").clientWidth; 
                             seekBarFlg = false;
                         }
                     });
@@ -1095,7 +1115,7 @@
     
                 let whitekey = piaWid/52; //白鍵の横幅
                 let blackkey = piaWid/88; //黒鍵の横幅
-                let midiSpeed = 7; //流れる速さ
+                let midiSpeed = 8; //流れる速さ
                 let midiSprit = 10/midiSpeed; //midiとmidiの間
                 function drawPRoll(track){
                     for(let j=0;j<mid_h_track-1;j++){
@@ -1220,11 +1240,34 @@
                 function displayItem(iflug){
                     if(iflug){
                         displayItemTimer = 0;
-                        document.getElementById('fcontainer').style.display = "flex";
-                        document.getElementById('seekcircle').style.display = "block";
+                        document.getElementById('fcontainer').style.visibility = "visible";
+                        document.getElementById('seekcircle').style.visibility = "visible";
                     }else{
-                        document.getElementById('fcontainer').style.display = "none";
-                        document.getElementById('seekcircle').style.display = "none";
+                        document.getElementById('fcontainer').style.visibility = "hidden";
+                        document.getElementById('seekcircle').style.display = "hidden";
+                    }
+                }
+
+                function previewEffect()
+                {
+                    if(preview)
+                    {
+                        let i = 3;
+                        let a = preview/1000 - i;
+                        setVolume();
+                        let volume = music.volume;
+                        let decline = (preview - time)/i/1000;
+                        let feedout = (preview - time)/(i)/1000;
+                        if(a < time/1000)
+                        {
+                            music.volume = volume*decline;
+
+                            ctx.beginPath();
+                            ctx.rect(0,0,canvas.width, canvas.height);
+                            ctx.fillStyle = "rgba(0, 0, 0, "+(1-feedout)+")";
+                            ctx.fill();
+                            ctx.closePath();
+                        }
                     }
                 }
     
@@ -1297,8 +1340,8 @@
                             displayItem(false);
                         }
                     }
-                    console.log(displayItemTimer);
-    
+
+                    previewEffect();
                 }
                 setInterval(draw, interv);
                 if(flag){
@@ -1521,8 +1564,32 @@
                     }
                 }
 
+                let deletecs = document.getElementsByName("DeleteC");
+                for(let i=0;i<deletecs.length;i++)
+                {
+                    deletecs[i].addEventListener('click', function(e){
+                        $.ajax({
+                            //サーバに送信するリクエストの設定
+                            'url': '{% url "deleteC" %}',
+                            'type': 'POST',
+                            'data': {
+                                'deleteC_id': e.target.dataset.id,
+                            },
+                            'dataType': 'json'
+                        })
+                        .done(function(){
+                            //通信成功時の処理
+                            document.getElementById("comment_box_"+e.target.dataset.id).remove();
+                        })
+                        .fail(function(){
+                            //通信失敗時の処理
+                        })
+                    });
+                }
+
                 let likecs = document.getElementsByName("LikeC");
-                for(let i=0;i<likecs.length;i++){
+                for(let i=0;i<likecs.length;i++)
+                {
                     if( likecs[i].dataset.value>0){
                         likecs[i].className = "fas fa-heart";
                         likecs[i].style.color = "var(--main-color)";

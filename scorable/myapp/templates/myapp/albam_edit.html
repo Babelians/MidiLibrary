@@ -30,7 +30,7 @@
                     {% endfor %}-->
                 {{ s_formset.management_form }}
                 <button type="submit">更新</button>
-                <button class="btn" form="delete_form" type="submit" onclick='return confirm("本当に削除しますか？アルバムに関連付けられた楽曲も完全に削除されます。");' style="margin-left: 794px; background-color: brown;">削除</button>
+                <button class="btn" form="delete_form" type="submit" onclick= "confirm('本当に削除しますか？アルバムに関連付けられた楽曲も完全に削除されます。');" style="margin-left: 794px; background-color: brown;">削除</button>
             </div>
         </form>
         <form method="post" id="delete_form" action="{% url 'albam_delete' pk=albam.pk %}">{% csrf_token %}

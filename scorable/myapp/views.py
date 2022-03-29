@@ -297,10 +297,15 @@ def score_detail(request, pk):
     recommend_byAlbam = Score.objects.filter(albam=score.albam, albam_num=score.albam_num+1)
     recommend_byTag = score_to_score_byTags(score)
     
-    if request.user.id:
-        purchased = Score_buying_history.objects.filter(score_id=score.id, user_id=request.user.id)
+    if request.user.id and Score_buying_history.objects.filter(score_id=score.id, user_id=request.user.id):
+        purchased = True
+        preview = False
     else:
         purchased = False
+        if score.price:
+            preview = 20*1000
+        else:
+            preview = False
 
     account = stripe.Account.retrieve(score.artist.stripe_id)
 
@@ -501,6 +506,7 @@ def score_detail(request, pk):
         'currency': currency,
         'tags':score_to_tagsName(score),
         'barSplit':bar_split,
+        'preview': preview,
     })
 
 def like(request, pk): #いいね
@@ -554,6 +560,15 @@ def likeC(request):
 
         }
         return JsonResponse(data)
+
+def deleteC(request):
+    pk = int(request.POST.get('deleteC_id'))
+    targetComment = Comment.objects.get(pk=pk)
+    targetComment.delete()
+    data = {
+
+    }
+    return JsonResponse(data)
 
 def comment(request, pk):
     score = get_object_or_404(Score, pk=pk)

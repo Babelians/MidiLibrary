@@ -88,17 +88,8 @@ button:hover{
     flex-wrap: wrap;
 }
 
-.user_detail_border{
-    width: 950px; 
-    border: 1px groove #c9c9c9;
-}
-
 .passive{
     display: none;
-}
-
-.inner-content{
-    margin: 0 auto;
 }
 
 

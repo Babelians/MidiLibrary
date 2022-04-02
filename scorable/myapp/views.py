@@ -297,7 +297,7 @@ def score_detail(request, pk):
     recommend_byAlbam = Score.objects.filter(albam=score.albam, albam_num=score.albam_num+1)
     recommend_byTag = score_to_score_byTags(score)
     
-    if request.user.id and Score_buying_history.objects.filter(score_id=score.id, user_id=request.user.id):
+    if request.user.id and Score_buying_history.objects.filter(score_id=score.id, user_id=request.user.id) or request.user.id == score.artist.id:
         purchased = True
         preview = False
     else:

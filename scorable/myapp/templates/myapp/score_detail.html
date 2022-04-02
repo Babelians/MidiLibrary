@@ -33,7 +33,7 @@
         }
         #seekcircle{
             position: absolute;
-            display: block;
+            visibility: hidden;
             border-radius: 50%;
             width: 14px;
             height: 14px;
@@ -1244,7 +1244,7 @@
                         document.getElementById('seekcircle').style.visibility = "visible";
                     }else{
                         document.getElementById('fcontainer').style.visibility = "hidden";
-                        document.getElementById('seekcircle').style.display = "hidden";
+                        document.getElementById('seekcircle').style.visibility = "hidden";
                     }
                 }
 
@@ -1257,14 +1257,30 @@
                         setVolume();
                         let volume = music.volume;
                         let decline = (preview - time)/i/1000;
-                        let feedout = (preview - time)/(i)/1000;
-                        if(a < time/1000)
+                        let decline2 = (time/1000)/i;
+                        if(0 <= time/1000 && time/1000 < i)
                         {
-                            music.volume = volume*decline;
+                            music.volume = volume*decline2;
 
                             ctx.beginPath();
                             ctx.rect(0,0,canvas.width, canvas.height);
-                            ctx.fillStyle = "rgba(0, 0, 0, "+(1-feedout)+")";
+                            ctx.fillStyle = "rgba(0, 0, 0, "+(1-decline2)+")";
+                            ctx.fill();
+                            ctx.closePath();
+                        }
+                        else if(a < time/1000) //最後の三秒
+                        {
+                            if(volume*decline<0)
+                            {
+                                music.volume = 0;
+                            }else
+                            {
+                                music.volume = volume*decline;
+                            }
+
+                            ctx.beginPath();
+                            ctx.rect(0,0,canvas.width, canvas.height);
+                            ctx.fillStyle = "rgba(0, 0, 0, "+(1-decline)+")";
                             ctx.fill();
                             ctx.closePath();
                         }
@@ -1286,7 +1302,7 @@
                     let t2 = zeroPadding(Math.floor(time/1000%60), 2);
                     document.getElementById("current_time").childNodes[1].data = t+":"+t2+"/";
     
-                    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                     resize();
     

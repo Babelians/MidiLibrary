@@ -76,7 +76,7 @@
             margin-left: 30px;
         }
         #notice{
-            cursor: pointer; 
+            cursor: pointer;
             margin: auto 0 auto 0; 
             margin-left: 30px;
         }
@@ -84,12 +84,50 @@
             display: flex;
             width: 140px;
         }
+        #home-add{
+            margin: 79px 0 0 auto;
+        }
+        #home-context-parent{
+            display: flex;
+            width: 950px; 
+        }
+        .user_detail_border{
+            width: 950px;
+            border: 1px groove #c9c9c9;
+        }
+        .inner-content{
+            margin: 0 auto;
+            width: 1150px;
+        }
+        @media screen and (max-width: 1200px) {
+            #home-add{
+                display: none;
+            }
+        }
+        @media screen and (max-width:1150px) {
+            .inner-content{
+                margin: 0 auto;
+                width: 100%;
+            }
+        }
+        @media screen and (max-width: 970px){
+            #userdetail-parent{
+                width: 100%;
+            }
+            .user_detail_border{
+                width: 100%;
+                border: 1px groove #c9c9c9;
+            }
+        }
         @media screen and (max-width: 850px) {
             #search{
                 width: 250px;
                 height: 35px;
             }
             .head-add{
+                display: none;
+            }
+            #home-add{
                 display: none;
             }
         }
@@ -117,6 +155,9 @@
             .head-add{
                 display: none;
             }
+            #home-add{
+                display: none;
+            }
         }
         @media screen and (max-width: 450px) {
             #search{
@@ -140,6 +181,9 @@
                 margin-left: 14px;
             }
             .head-add{
+                display: none;
+            }
+            #home-add{
                 display: none;
             }
         }
@@ -294,9 +338,9 @@
 
         {% block content %}
         <div class="content">
-            <div class="inner-content" style="margin: 0 auto; width: 1150px;">
+            <div class="inner-content">
                 <div style="align-items: center; display: flex;">
-                    <div style="display: flex; width: 950px;">
+                    <div id="home-context-parent">
                         <div id="face_parent" style="width: 100px; height: 100px; border-radius: 50%;">
                             <img src="{{ my.face.url }}" id="home_face" style="width: 95px; height: 95px; border-radius: 50%;"/>
                         </div>
@@ -401,12 +445,12 @@
                     });
                 </script>
                 <div style="display: flex;">
-                    <div style="display: block;">
+                    <div style="display: block;" id="userdetail-parent">
                         {% block home %}
                         {% endblock %}
                     </div>
                     <!-- admax -->
-                    <div style="margin: 79px 0 0 auto;">
+                    <div id="home-add">
                         <script src="https://adm.shinobi.jp/s/c77c5557016406a28973228f71af04ca"></script>
                     </div>
                     <!-- admax -->

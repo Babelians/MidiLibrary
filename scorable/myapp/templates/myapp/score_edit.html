@@ -13,7 +13,7 @@
                 </div>
             </div>
             <button type="submit" style="margin-left: 200px;">更新</button>
-            <button class="btn" form="delete_form" type="submit" onclick='return confirm("本当に削除しますか？完全に削除されます。");' style="margin-left: 546px; background-color: brown;">削除</button>
+            <button class="btn" form="delete_form" type="submit" onclick='confirm("本当に削除しますか？完全に削除されます。");' style="margin-left: 546px; background-color: brown;">削除</button>
         </form>
         <form method="post" id="delete_form" action="{% url 'score_delete' pk=score.pk %}">{% csrf_token %}
         </form>

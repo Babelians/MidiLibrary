@@ -12,26 +12,26 @@
 <div class="user_detail_border">
     {% for albam, scores in albams.items %}
     <div class="post" style="width: 100%; display: flex; border-bottom: 1px groove rgb(206, 206, 206);">
-        <div style="margin: 10px 10px;">
-            <img src="{{ albam.art.url }}" style="width: 200px; height: 200px;"/>
+        <div style="margin: 1% 1%;">
+            <img src="{{ albam.art.url }}" style="width: 100px; height: 100px;"/>
         </div>
-        <div style="display: block;">
+        <div style="display: block; width: 80%;">
             <div style="display: flex;">
-                <div style="display: inline-flex; margin-top: 10px; font-size: 20px; margin-left: 10px;">{{ albam.albam_title }}</div>
+                <div style="display: inline-flex; margin-top: 10px; font-size: 20px; margin-left: 1%;">{{ albam.albam_title }}</div>
                 {% if user == my %}
                 <div style=" width: 50px; margin-top: 10px; margin-left: 20px;"><a href="{% url 'albam_edit' pk=albam.pk %}">編集</a></div>
                 {% endif %}
             </div>
             {% for score in scores %}
-            <div style="width: 700px; border-bottom: 1px groove #c9c9c9; font-size: 19px; display: flex;">
+            <div style="width: 100%; border-bottom: 1px groove #c9c9c9; font-size: 19px; display: flex; margin-left: 1%;">
                 <div style="width: 25px; text-align: center;">{{forloop.counter}}</div>
-                <div style="width: 600px;"><a href="{% url 'score_detail' pk=score.pk %}" style="margin-left: 10px;">{{ score.song_name }}</a></div>
+                <div style="width: 100%;"><a href="{% url 'score_detail' pk=score.pk %}" style="margin-left: 1%;">{{ score.song_name }}</a></div>
                 {% if user == my %}
                 <div style="margin: 0 0 0 auto; width: 50px;"><a href="{% url 'score_edit' pk=score.pk %}">編集</a></div>
                 {% endif %}
             </div>
             {% endfor %}
-            <div style="height: 30px; width: 950px;"></div>
+            <div style="height: 10px; width: 100%;"></div>
         </div>
     </div>
     {% endfor %}

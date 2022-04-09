@@ -263,6 +263,7 @@ def search_byFollow(user):
     for f in following:
         scores.append(Score.objects.filter(artist=f.follow))
     scores = list(itertools.chain.from_iterable(scores))
+    scores = list(reversed(scores))
     return scores
 
 def score_to_score_byTags(score):
@@ -272,6 +273,7 @@ def score_to_score_byTags(score):
         scores.append(Score.objects.filter(tags=tag))
     scores = list(itertools.chain.from_iterable(scores))
     scores = list(set(scores))
+    scores = list(reversed(scores))
     return scores
 
 def search_byLike_fromTag(user):
@@ -286,6 +288,7 @@ def search_byLike_fromTag(user):
         scores.append(Score.objects.filter(tags=t))
     scores = list(itertools.chain.from_iterable(scores))
     scores = list(set(scores))
+    scores = list(reversed(scores)) #反転
     return scores
 
 

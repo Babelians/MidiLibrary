@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from django.conf import settings
 from django.db.models.fields import NullBooleanField
 from django.http.response import JsonResponse
@@ -601,6 +602,11 @@ def addTag_byScore(request, score, n):
             score.tags.remove(tag)
             tag.num += n
             tag.save()
+            tag_zerocheck(tag)
+
+def tag_zerocheck(tag):
+    if tag.num == 0:
+        tag.delete()
 
 def score_edit(request, pk):
     score = Score.objects.get(pk=pk)
@@ -641,7 +647,7 @@ def deleteScore(score):
         albam_art_path = []
     os.remove(audio_path)
     os.remove(midi_path)
-
+    addTag_byScore(NULL,score, -1)
     score.delete()
     if albam:
         albam_scores = Score.objects.filter(albam=albam).order_by('albam_num')

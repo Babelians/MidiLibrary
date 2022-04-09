@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from django.conf import settings
 from django.db.models.fields import NullBooleanField
 from django.http.response import JsonResponse
@@ -647,7 +646,7 @@ def deleteScore(score):
         albam_art_path = []
     os.remove(audio_path)
     os.remove(midi_path)
-    addTag_byScore(NULL,score, -1)
+    addTag_byScore([], score, -1)
     score.delete()
     if albam:
         albam_scores = Score.objects.filter(albam=albam).order_by('albam_num')
@@ -659,7 +658,6 @@ def deleteScore(score):
     else:
         if not art_path == face_path:
             os.remove(art_path)
-
 
 def deleteAlbam(albam):
     art_path = os.path.join(MEDIA_ROOT, str(albam.art))

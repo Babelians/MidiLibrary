@@ -378,6 +378,8 @@ def score_detail(request, pk):
     mid_t_tempo = []
     mid_t_rhythm = []
     mid_t_maxdt = 0
+    highest_note = 0
+    lowest_note = 24 + 88
 
     for i in range(mid_h_track):
         midtrack.append(f.read(4).hex())
@@ -424,7 +426,7 @@ def score_detail(request, pk):
                     mid_t_marker[i] = f.read(int(f.read(1).hex(), 16)).hex()
                 else:
                     hoge2 = f.read(int(f.read(1).hex(), 16)).hex()
-            elif hoge == ('80'or'81'or'82'or'83'or'84'or'85'or'86'or'87'or'88'or'89'or'8a'or'8b'or'8c'or'8d'or'8e'or'8f'):
+            elif hoge == ('80'or'81'or'82'or'83'or'84'or'85'or'86'or'87'or'88'or'89'or'8a'or'8b'or'8c'or'8d'or'8e'or'8f'): #ノートの終端
                 mid_t_note[i].append([])
                 mid_t_note[i][len(mid_t_note[i])-1].append(mid_t_dtime) #デルタタイム
                 mid_t_note[i][len(mid_t_note[i])-1].append(int(f.read(1).hex(), 16)) #音高
@@ -432,13 +434,17 @@ def score_detail(request, pk):
                 mid_t_note[i][len(mid_t_note[i])-1][2] = 0
                 if mid_t_maxdt < mid_t_dtime:
                     mid_t_maxdt = mid_t_dtime
-            elif hoge == ('90'or'91'or'92'or'93'or'94'or'95'or'96'or'97'or'98'or'99'or'9a'or'9b'or'9c'or'9d'or'9e'or'9f'):
+            elif hoge == ('90'or'91'or'92'or'93'or'94'or'95'or'96'or'97'or'98'or'99'or'9a'or'9b'or'9c'or'9d'or'9e'or'9f'): #ノートの開始
                 mid_t_note[i].append([])
                 mid_t_note[i][len(mid_t_note[i])-1].append(mid_t_dtime)
                 mid_t_note[i][len(mid_t_note[i])-1].append(int(f.read(1).hex(), 16))
                 mid_t_note[i][len(mid_t_note[i])-1].append(int(f.read(1).hex(), 16))
                 if mid_t_maxdt < mid_t_dtime:
                     mid_t_maxdt = mid_t_dtime
+                if mid_t_note[i][len(mid_t_note[i])-1][1] < lowest_note: #最も音高が低いノートだったら
+                    lowest_note = mid_t_note[i][len(mid_t_note[i])-1][1] 
+                if mid_t_note[i][len(mid_t_note[i])-1][1] > highest_note: #最も音高が高いノートだったら
+                    highest_note = mid_t_note[i][len(mid_t_note[i])-1][1]
             elif hoge == ('c0'or'c1'or'c2'or'c3'or'c4'or'c5'or'c6'or'c7'or'c8'or'c9'or'ca'or'cb'or'cc'or'cd'or'ce'or'cf'): #プログラムチェンジとやら
                 hoge = f.read(1).hex()
                 if mid_t_maxdt < mid_t_dtime:
@@ -510,6 +516,8 @@ def score_detail(request, pk):
         'tags':score_to_tagsName(score),
         'barSplit':bar_split,
         'preview': preview,
+        'lowestNote': lowest_note,
+        'highestNote': highest_note,
     })
 
 def like(request, pk): #いいね

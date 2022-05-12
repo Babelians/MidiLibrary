@@ -159,7 +159,7 @@
             </footer>
 
             <div id="score" style=" width: 1101px; height: 601px; display: flex; justify-content: center; overflow: hidden; position: relative; background-color: var(--art-background-color);">
-                <img id="score_art" src="{{ score.score_art.url }}" style="height: 601px; filter: brightness(50%);" />
+                <img id="score_art" src="{{ score.score_art.url }}" style="height: 601px; filter: brightness(60%);" />
                 <canvas id="myCanvas" style="position: absolute; z-index: 2;"></canvas>
             </div>
         </div>
@@ -404,7 +404,7 @@
             let my = 0;
             let mouseX = -1;
             let mouseY = -1;
-            var time = -10;
+            let time = -10;
             var flag = true; //再生
             let mouseDownFlg = false;
             var mouseTrackDown = false;
@@ -1350,16 +1350,21 @@
             }
 
             //線画
-            let interv = 20;
+            let interv = 0;
+
+            function timer() {
+                let t = time
+                time = music.currentTime * 1000;
+                interv = time - t;
+            }
+
             let dt = interv;
             let dTime_o = -480;
             judgeEnableBar();
 
             function draw() {
 
-                //time += dt;
-
-                time = music.currentTime * 1000;
+                timer();
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1417,8 +1422,10 @@
                 previewEffect();
                 setMaxMs();
                 updateTimeView();
+                requestAnimationFrame(draw);
             }
-            setInterval(draw, interv);
+            draw();
+            //setInterval(draw, interv);
             if (flag) {
                 music.play();
             }
@@ -1428,7 +1435,6 @@
             function clickPlay() {
                 flag = !flag;
                 if (flag) {
-                    dt = interv;
                     if (maxms <= time) {
                         time = 0;
                     }
@@ -1437,7 +1443,6 @@
                     document.getElementById("playbtn").src = document.getElementById("pause").src;
                     document.getElementById("playbtn").style = "height: 70%;";
                 } else {
-                    dt = 0;
                     music.pause();
                     document.getElementById("playbtn").src = document.getElementById("play").src;
                     document.getElementById("playbtn").style = "height: 70%; border-radius: 50%;";
@@ -1450,7 +1455,7 @@
                     music.currentTime = 0; // 再生位置を先頭に移動
                     music.play();
                     time = 0;
-                } else if (dt == interv) {
+                } else {
                     clickPlay();
                 }
             }

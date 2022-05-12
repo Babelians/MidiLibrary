@@ -424,6 +424,7 @@
             let colorRecMinus = 20;
             let newColor = new Array(3);
             let displayItemTimer = 0;
+            let diTime = 3;
             if (!smartPhone) {
                 document.getElementById("seekparent").addEventListener("mousedown", (e) => {
                     seekBarFlg = true;
@@ -584,7 +585,7 @@
                 });
 
                 document.getElementById("seekparent").addEventListener("touchend", (e) => {
-                    displayItemTimer = 10;
+                    displayItemTimer = diTime;
                 });
 
                 document.getElementById("volumeparent").addEventListener("touchstart", (e) => {
@@ -635,7 +636,7 @@
                 });
 
                 canvas.addEventListener("touchend", (e) => {
-                    displayItemTimer = 10;
+                    displayItemTimer = diTime;
                 });
             }
 
@@ -1298,7 +1299,7 @@
 
             function displayItem(iflug) {
                 if (iflug) {
-                    displayItemTimer = 0;
+                    displayItemTimer = diTime;
                     document.getElementById('fcontainer').style.visibility = "visible";
                     document.getElementById('seekcircle').style.visibility = "visible";
                 } else {
@@ -1413,7 +1414,7 @@
                 }
 
                 if (smartPhone && displayItemTimer > 0 && !seekBarFlg && !volumeBarFlg) {
-                    displayItemTimer -= 1 / interv;
+                    displayItemTimer -= interv / 1000;
                     if (displayItemTimer <= 0 && flag) {
                         displayItem(false);
                     }
@@ -1438,7 +1439,7 @@
                     if (maxms <= time) {
                         time = 0;
                     }
-                    displayItemTimer = 5;
+                    displayItemTimer = diTime;
                     music.play();
                     document.getElementById("playbtn").src = document.getElementById("pause").src;
                     document.getElementById("playbtn").style = "height: 70%;";

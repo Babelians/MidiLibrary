@@ -401,6 +401,8 @@
 
             let seekBarFlg = false;
             let volumeBarFlg = false;
+            let muteflg = false;
+            let loopflg = false;
             let my = 0;
             let mouseX = -1;
             let mouseY = -1;
@@ -1470,8 +1472,6 @@
                 }
             }
 
-            loopflg = false;
-
             function clickLoop() {
                 loopflg = !loopflg;
                 if (loopflg) {
@@ -1480,8 +1480,6 @@
                     document.getElementById("loopbtn").style = "height: 70%;";
                 }
             }
-
-            muteflg = false;
 
             function clickVolume() {
                 muteflg = !muteflg;

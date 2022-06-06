@@ -12,6 +12,11 @@
         overflow-y: scroll;
         height: 400px;
     }
+
+    input, select {
+        height: 35px;
+        font-size: 18px;
+    }
     
     @media screen and (max-width:1050px) {
         #agreement_parent {
@@ -24,21 +29,24 @@
 </style>
 <div class="content">
     <div id="subcontent" style="margin: 0 0 0 10px;">
-        <h5>アカウント作成</h5>
+        <h5 style="font-size: 20px;">アカウント作成</h5>
         <form method="POST">
             {% csrf_token %}
             <p>
-                <label for="id_email">メールアドレス:</label>
+                <div>メールアドレス</div>
                 <input type="email" name="email" maxlength="254" autofocus="" required="" id="id_email">
                 <!--<span class="helptext">アカウントは1つのアドレスにつき１つです</span>-->
             </p>
             <p>
-                <label for="id_username">ユーザー名:</label>
+                <div>ユーザー名</div>
                 <input type="text" name="username" maxlength="150" autocapitalize="none" autocomplete="username" required="" id="id_username">
-                <!--<span class="helptext">１５０字以内, 記号は 「@/./+/-/_ 」が使えます</span>-->
+                <ul>
+                    <li>記号は 「@/./+/-/_ 」が使えます。</li>
+                    <li>スペースは使用できません。</li>
+                </ul>
             </p>
             <p>
-                <label for="id_country">国籍:</label>
+                <div>国籍</div>
                 <select name="country" id="id_country" required="true">
                     <option value="">Country...</option>
                     <option value="JP">日本</option>
@@ -86,7 +94,7 @@
             </p>
 
             <p>
-                <label for="id_password1">パスワード:</label> <input type="password" name="password1" autocomplete="new-password" required="" id="id_password1">
+                <div>パスワード</div> <input type="password" name="password1" autocomplete="new-password" required="" id="id_password1">
                 <span class="helptext"></span>
             </p>
             <ul>
@@ -94,7 +102,7 @@
                 <li>推測しやすいものは使用できないことがあります</li>
                 <li>数字だけにすることはできません</li>
             </ul>
-            <p><label for="id_password2">パスワード確認:</label>
+            <p><div>パスワード確認</div>
                 <input type="password" name="password2" autocomplete="new-password" required="" id="id_password2">
                 <!--<span class="helptext">もう一度パスワードを入力してください</span>-->
             </p>
@@ -104,7 +112,7 @@
     <div id="agreement_parent">
         <div class="wrapHINAGATA" style="width: 90%; margin: 0 auto;">
             <h1>利用規約</h1>
-            <p>この利用規約（以下，「本規約」といいます。）は，MidiLibrary（以下，「当社」といいます。）がこのウェブサイト上で提供するサービス（以下，「本サービス」といいます。）の利用条件を定めるものです。登録ユーザーの皆さま（以下，「ユーザー」といいます。）には，本規約に従って，本サービスをご利用いただきます。</p>
+            <p>この利用規約（以下，「本規約」といいます。）は，MIDILibrary（以下，「当社」といいます。）がこのウェブサイト上で提供するサービス（以下，「本サービス」といいます。）の利用条件を定めるものです。登録ユーザーの皆さま（以下，「ユーザー」といいます。）には，本規約に従って，本サービスをご利用いただきます。</p>
 
             <h2>第1条（適用）</h2>
             <ol>
@@ -136,7 +144,7 @@
             <ol>
                 <li>ユーザーは，本サービスの有料部分の対価として，当社が別途定め，本ウェブサイトに表示する利用料金を，当社が指定する方法により支払うものとします。</li>
                 <li>ユーザーが利用料金の支払を遅滞した場合には，ユーザーは年14．6％の割合による遅延損害金を支払うものとします。</li>
-                <li>ユーザーがMidiデータの販売で得られる利益は販売価格の90%とし、10%は当社が手数料として差し引きます。</li>
+                <li>ユーザーがMIDIデータの販売で得られる利益は販売価格の90%とし、10%は当社が手数料として差し引きます。</li>
             </ol>
 
             <h2>第5条（禁止事項）</h2>
@@ -235,7 +243,7 @@
         </div>
     </div>
     <div style="margin: 0 0 0 10px;">
-        <div style="height: 30px; margin-top: 10px;">*利用規約に同意します。<input type="checkbox" required="true"></div>
+        <div style="height: 30px; margin-top: 10px; display: flex; align-items: center;"><div>*利用規約に同意します。</div><input type="checkbox" required="true"></div>
         <button type="submit">Signup</button>
     </div>
     </form>

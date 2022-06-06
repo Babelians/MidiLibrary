@@ -2,12 +2,29 @@
 
 {% block content %}
     <div class="content">
-        <h5>ログイン</h5>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" >
-        </form>
-        <a href="{% url 'password_reset' %}">パスワードをお忘れですか?</a>
+        <div style="width: 300px; margin: 0 auto; border: 1px rgb(223, 223, 223) solid;">
+            <div style="width: 80%; margin: 0 auto;">
+                <div style="height: 15px;"></div>
+                <h5 style="margin: 0 auto; width: 90px; font-size: 20px;">ログイン</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div style="height: 15px;"></div>
+                    <div>メールアドレス</div>
+                    <input type="text" name="username" autofocus="" autocapitalize="none" 
+                        autocomplete="username" maxlength="254" required="" id="id_username" style="width: 100%; height: 40px; font-size: 100%;">
+                    <div style="margin: 15px 0 0 0;">パスワード</div>
+                    <input type="password" name="password" autocomplete="current-password" required="" id="id_password" style="width: 100%; height: 40px; font-size: 100%;">
+                    <div style="height: 15px;"></div>
+                    <input type="submit" >
+                </form>
+                <div>
+                    <a href="{% url 'signup' %}">アカウント作成</a>
+                </div>
+                <div>
+                    <a href="{% url 'password_reset' %}">パスワードをお忘れですか?</a>
+                </div>
+                <div style="height: 15px;"></div>
+            </div>
+        </div>
     </div>
 {% endblock %}

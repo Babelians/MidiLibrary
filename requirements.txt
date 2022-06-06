@@ -1,4 +1,5 @@
 mysqlclient
-django~=3.1.7
+django~=3.2.9
 pillow~=8.1.1
 stripe
+pip~=21.1.1
